@@ -1,13 +1,13 @@
 import { Text, View, TextInput, TouchableOpacity } from "react-native";
 import { useForm, Controller } from "react-hook-form";
-import { URL } from "../environments/env";
-import { styles } from "../style/style";
-import { Users } from "../models/users";
+import { URL } from "../../environments/env";
+import { styles } from "../../style/style";
+import { Users } from "../../models/users";
 import { useState } from "react";
 import React from "react";
 import axios from "axios";
 
-export default function SignIn({ navigation }) {
+export default function SignIn({ navigation, route }) {
   //#region atributos
   let users = [];
   let user = new Users();
@@ -97,10 +97,11 @@ export default function SignIn({ navigation }) {
       </TouchableOpacity>
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate("Signup");
+          navigation.navigate("UsersList", { users: users });
         }}
       >
-        <Text style={styles.text}>Don't have an account?</Text>
+        {/* <Text style={styles.text}>Don't have an account?</Text> */}
+        <Text style={styles.text}>List</Text>
       </TouchableOpacity>
       <Text style={{ fontWeight: "bold", marginTop: 10, color: "black" }}>
         {errorMess}

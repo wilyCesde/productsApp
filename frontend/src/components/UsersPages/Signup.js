@@ -1,8 +1,8 @@
 import { Text, View, TextInput, TouchableOpacity } from "react-native";
 import { useForm, Controller } from "react-hook-form";
-import { URL } from "../environments/env";
-import { styles } from "../style/style";
-import { Users } from "../models/users";
+import { URL } from "../../environments/env";
+import { styles } from "../../style/style";
+import { Users } from "../../models/users";
 import { useState } from "react";
 import React from "react";
 import axios from "axios";

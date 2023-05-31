@@ -6,7 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
-import { styles } from "../style/style";
+import { styles } from "../../style/style";
 
 export default function Sale({navigation}) {
   return (
