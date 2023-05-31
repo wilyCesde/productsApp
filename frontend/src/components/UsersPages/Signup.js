@@ -7,10 +7,11 @@ import { useState } from "react";
 import React from "react";
 import axios from "axios";
 
-export default function SignUp({ navigation }) {
+export default function SignUp({ navigation, route }) {
   //#region atributos
   let users = [];
   let user = new Users();
+  const { _id, name, username, email, password } = route.params.user;
   // let auth = false;
 
   const [formData, setFormData] = useState(new Users());
@@ -59,6 +60,27 @@ export default function SignUp({ navigation }) {
     }
     reset();
   };
+
+  const editUser = async () => {
+    await axios
+      .put(`${URL}/users/update`, formData)
+      .then((response) => {
+        if (response) {
+          setErrorMess("Usuario ingresado con exito.");
+          setTimeout(() => {
+            navigation.navigate("Signin");
+            setErrorMess("");
+          }, 2000);
+        }
+      })
+      .catch((e) => {
+        console.log(e);
+        setErrorMess(e);
+        setTimeout(() => {
+          setErrorMess("");
+        }, 2000);
+      });
+  };
   //#endregion
 
   //#region events
@@ -77,31 +99,31 @@ export default function SignUp({ navigation }) {
         style={styles.textInput}
         placeholder="Name"
         onChangeText={(e) => onChange(e, "name")}
-        defaultValue={formData.name}
+        defaultValue={name ? name : formData.name}
       />
       <TextInput
         style={styles.textInput}
         placeholder="Username"
         onChangeText={(e) => onChange(e, "username")}
-        defaultValue={formData.username}
+        defaultValue={username ? username : formData.username}
       />
       <TextInput
         style={styles.textInput}
         placeholder="Email"
         onChangeText={(e) => onChange(e, "email")}
-        defaultValue={formData.email}
+        defaultValue={email ? email : formData.email}
       />
       <TextInput
         style={styles.textInput}
         placeholder="Password"
         onChangeText={(e) => onChange(e, "password")}
-        defaultValue={formData.password}
+        defaultValue={password ? password : formData.password}
       />
       <TouchableOpacity
         style={styles.button}
-        onPress={handleSubmit(createUser)}
+        onPress={_id ? handleSubmit(editUser) : handleSubmit(createUser)}
       >
-        <Text>Sign Up</Text>
+        <Text>{_id ? "Edit User" : "Sign Up"}</Text>
       </TouchableOpacity>
       <TouchableOpacity
         onPress={() => {
@@ -109,6 +131,13 @@ export default function SignUp({ navigation }) {
         }}
       >
         <Text style={styles.text}>¿Ya tienes una cuenta?</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate("UsersList");
+        }}
+      >
+        <Text style={styles.text}>Lista de usuarios</Text>
       </TouchableOpacity>
       <Text style={{ fontWeight: "bold", marginTop: 10, color: "black" }}>
         {errorMess}

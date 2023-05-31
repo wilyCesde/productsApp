@@ -40,6 +40,14 @@ const styles = StyleSheet.create({
     margin: 5,
     width: "40%",
   },
+  item: {
+    width: "95%",
+    textAlign: "left",
+    borderWidth: 2,
+    borderColor: "black",
+    paddingHorizontal: 2,
+    margin: 5,
+  },
 });
 
 export { styles };

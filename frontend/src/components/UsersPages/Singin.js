@@ -97,11 +97,10 @@ export default function SignIn({ navigation, route }) {
       </TouchableOpacity>
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate("UsersList", { users: users });
+          navigation.navigate("Signup", { user: user });
         }}
       >
-        {/* <Text style={styles.text}>Don't have an account?</Text> */}
-        <Text style={styles.text}>List</Text>
+        <Text style={styles.text}>Don't have an account?</Text>
       </TouchableOpacity>
       <Text style={{ fontWeight: "bold", marginTop: 10, color: "black" }}>
         {errorMess}
