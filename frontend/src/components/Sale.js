@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { styles } from "../style/style";
 
-export default function Sale(navigation) {
+export default function Sale({navigation}) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Products</Text>

@@ -6,14 +6,17 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
-
 import { styles } from "../style/style";
 
-export default function Products(navigation) {
+export default function Products({ navigation }) {
+  // if (auth && user) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Products</Text>
-      <Text style={styles.subtitle}>Vamos a ver</Text>
+      <Text style={styles.title}>Products by</Text>
+      <Text style={styles.subtitle}>Auth</Text>
     </View>
   );
+  // } else {
+  //   navigation.navigate("Signin");
+  // }
 }

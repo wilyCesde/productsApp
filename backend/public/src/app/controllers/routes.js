@@ -37,14 +37,10 @@ router.get("/users/getById/:id", cors(), (req, res) => {
 router.get("/users/getByEmail/:email", cors(), (req, res) => {
   try {
     const { email } = req.params;
-    userSchema.findOne({ email: email }, function (err, docs) {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log("Result : ", docs);
-        res.json(docs);
-      }
-    });
+    userSchema
+      .findOne({ email: email })
+      .then((data) => res.json(data))
+      .catch((error) => res.json({ message: error }));
   } catch (error) {
     res.json({ message: error });
   }

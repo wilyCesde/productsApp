@@ -10,7 +10,7 @@ import {
 import axios from "axios";
 import { styles } from "../style/style";
 
-export default function SignUp(navigation) {
+export default function SignUp({navigation}) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Sign Up</Text>
