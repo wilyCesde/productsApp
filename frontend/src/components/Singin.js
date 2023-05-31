@@ -1,73 +1,68 @@
-import React from "react";
 import { Text, View, TextInput, TouchableOpacity } from "react-native";
-import { useState } from "react";
-import { styles } from "../style/style";
-import axios from "axios";
+import { useForm, Controller } from "react-hook-form";
 import { URL } from "../environments/env";
+import { styles } from "../style/style";
 import { Users } from "../models/users";
+import { useState } from "react";
+import React from "react";
+import axios from "axios";
 
 export default function SignIn({ navigation }) {
   //#region atributos
   let users = [];
   let user = new Users();
-  let auth = false;
+  // let auth = false;
 
   const [formData, setFormData] = useState(new Users());
   const [errorMess, setErrorMess] = useState("");
+
+  const { handleSubmit, reset } = useForm({
+    defaultValues: new Users(),
+  });
 
   //#endregion
 
   //#region functions
 
   //#region services
-  //get all users in the collection
-  async function getUsers() {
-    await axios
-      .get(`${URL}/users/getAll`)
-      .then((response) => {
-        if (response.data) {
-          users = response.data;
-        }
-        console.log(users);
-      })
-      .catch((e) => {
-        // Podemos mostrar los errores en la consola
-        console.log(e);
-      });
-  }
-  //get one user in the collection
-  async function getById(id) {
-    await axios
-      .get(`${URL}/users/getById/${id}`)
-      .then((response) => {
-        if (response.data) {
-          user = response.data;
-          if (user) {
-            console.log(user);
-            return user;
-          }
-        }
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  }
   //get one by email for login
-  async function getByEmail(email) {
+  const getByEmail = async () => {
     await axios
-      .get(`${URL}/users/getByEmail/${email}`)
+      .get(`${URL}/users/getByEmail/${formData.email}`)
       .then((response) => {
         if (response.data) {
           user = response.data;
-          return user;
+          if (user.password === formData.password) {
+            setErrorMess("Iniciando sesion...");
+            setTimeout(() => {
+              navigation.navigate("Products", {
+                user: user,
+              });
+              setErrorMess("");
+            }, 1500);
+          } else {
+            setErrorMess("El usuario no esta registrado");
+            setTimeout(() => {
+              navigation.navigate("Signup");
+              setErrorMess("");
+            }, 1500);
+          }
         } else {
-          console.log("No hay datos.");
+          setErrorMess("No hay datos para mostrar");
+          setTimeout(() => {
+            setErrorMess("");
+          }, 1500);
         }
       })
       .catch((e) => {
+        setErrorMess(e);
         console.log(e);
+        setTimeout(() => {
+          setErrorMess("");
+        }, 1500);
       });
-  }
+    reset();
+  };
   //#endregion
 
   //#region events
@@ -96,26 +91,7 @@ export default function SignIn({ navigation }) {
       />
       <TouchableOpacity
         style={styles.button}
-        onPress={() => {
-          if (formData.email !== "" && formData.password !== "") {
-            let userFind = getByEmail(formData.email);
-            if (userFind) {
-              setErrorMess("Iniciando sesion...");
-              auth = true;
-              setTimeout(() => {
-                navigation.navigate("Products", {
-                  auth: auth,
-                  user: user,
-                });
-              }, 1500);
-            }
-          } else {
-            setErrorMess("Todos los campos son obligatorios.");
-            setTimeout(() => {
-              setErrorMess("");
-            }, 1500);
-          }
-        }}
+        onPress={handleSubmit(getByEmail)}
       >
         <Text>Sign In</Text>
       </TouchableOpacity>
@@ -126,7 +102,7 @@ export default function SignIn({ navigation }) {
       >
         <Text style={styles.text}>Don't have an account?</Text>
       </TouchableOpacity>
-      <Text style={{ fontWeight: "bold", marginTop: 10, color: "red" }}>
+      <Text style={{ fontWeight: "bold", marginTop: 10, color: "black" }}>
         {errorMess}
       </Text>
     </View>
