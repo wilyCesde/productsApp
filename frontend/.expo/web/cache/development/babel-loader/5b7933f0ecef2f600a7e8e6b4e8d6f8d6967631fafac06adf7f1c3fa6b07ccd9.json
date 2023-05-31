@@ -1,0 +1,1 @@
+{"ast":null,"code":"export default function Sale(navigation) {}","map":{"version":3,"names":["Sale","navigation"],"sources":["D:/Cesde/react/product/src/components/sale.js"],"sourcesContent":["export default function Sale(navigation) {}\r\n"],"mappings":"AAAA,eAAe,SAASA,IAAIA,CAACC,UAAU,EAAE,CAAC"},"metadata":{},"sourceType":"module","externalDependencies":[]}
