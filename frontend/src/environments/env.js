@@ -1,4 +1,3 @@
-const PORT = 3200;
-const URL = `http://localhost:${PORT}/api/`;
+const URL = `http://localhost:3200/api`;
 
 export { URL };

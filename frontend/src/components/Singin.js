@@ -8,15 +8,21 @@ import {
 } from "react-native";
 import { styles } from "../style/style";
 import axios from "axios";
+import { URL } from "../environments/env";
 
 export default function SignIn({ navigation }) {
   async function getUsers() {
-    const users = await axios.get(`${URL}/users/getAll`);
-    if (users) {
-      return users;
-    } else {
-      return `No hay usuarios: ${users}`;
-    }
+    // const users = await axios.get(`${URL}/users/getAll`);
+    axios
+      .get(`${URL}/users/getAll`)
+      .then((response) => {
+        // users = response.data;
+        console.log(response.data);
+      })
+      .catch((e) => {
+        // Podemos mostrar los errores en la consola
+        console.log(e);
+      });
   }
 
   return (
