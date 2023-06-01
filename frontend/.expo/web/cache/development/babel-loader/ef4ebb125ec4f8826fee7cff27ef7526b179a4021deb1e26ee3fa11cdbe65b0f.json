@@ -1,0 +1,1 @@
+{"ast":null,"code":"export default function SignUp() {}","map":{"version":3,"names":["SignUp"],"sources":["D:/Cesde/react/product/src/components/signup.js"],"sourcesContent":["export default function SignUp() {}"],"mappings":"AAAA,eAAe,SAASA,MAAMA,CAAA,EAAG,CAAC"},"metadata":{},"sourceType":"module","externalDependencies":[]}

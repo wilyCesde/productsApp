@@ -1,0 +1,19 @@
+{
+  "name": "productsapp",
+  "version": "1.0.0",
+  "description": "Aplicacion completa: Frontend &amp; Backend en base a react native y node.",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/punxio/productsApp.git"
+  },
+  "keywords": [],
+  "author": "Juan Felipe Quintero Gutierrez",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/punxio/productsApp/issues"
+  },
+  "homepage": "https://github.com/punxio/productsApp#readme"
+}

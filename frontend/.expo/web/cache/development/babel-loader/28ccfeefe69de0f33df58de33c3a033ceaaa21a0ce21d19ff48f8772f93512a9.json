@@ -1,0 +1,1 @@
+{"ast":null,"code":"export default function Products(navigation) {}","map":{"version":3,"names":["Products","navigation"],"sources":["D:/Cesde/react/product/src/components/products.js"],"sourcesContent":["export default function Products(navigation) {}\r\n"],"mappings":"AAAA,eAAe,SAASA,QAAQA,CAACC,UAAU,EAAE,CAAC"},"metadata":{},"sourceType":"module","externalDependencies":[]}
