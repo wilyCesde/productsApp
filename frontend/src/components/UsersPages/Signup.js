@@ -11,8 +11,7 @@ export default function SignUp({ navigation, route }) {
   //#region atributos
   let users = [];
   let user = new Users();
-  const { _id, name, username, email, password } = route.params.user;
-  // let auth = false;
+  let { _id, name, username, email, password } = route.params.user;
 
   const [formData, setFormData] = useState(new Users());
   const [errorMess, setErrorMess] = useState("");
@@ -62,24 +61,37 @@ export default function SignUp({ navigation, route }) {
   };
 
   const editUser = async () => {
-    await axios
-      .put(`${URL}/users/update`, formData)
-      .then((response) => {
-        if (response) {
-          setErrorMess("Usuario ingresado con exito.");
+    if (
+      formData.name !== "" &&
+      formData.username !== "" &&
+      formData.email !== "" &&
+      formData.password !== ""
+    ) {
+      await axios
+        .put(`${URL}/users/update`, formData)
+        .then((response) => {
+          if (response) {
+            setErrorMess("Usuario ingresado con exito.");
+            setTimeout(() => {
+              navigation.navigate("Signin");
+              setErrorMess("");
+            }, 2000);
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+          setErrorMess(e);
           setTimeout(() => {
-            navigation.navigate("Signin");
             setErrorMess("");
           }, 2000);
-        }
-      })
-      .catch((e) => {
-        console.log(e);
-        setErrorMess(e);
-        setTimeout(() => {
-          setErrorMess("");
-        }, 2000);
-      });
+        });
+    } else {
+      setErrorMess("Todos los campos son obligatorios.");
+      setTimeout(() => {
+        setErrorMess("");
+      }, 2000);
+    }
+    reset();
   };
   //#endregion
 
@@ -93,8 +105,12 @@ export default function SignUp({ navigation, route }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
-      <Text style={styles.subtitle}>Login to the application</Text>
+      <Text style={styles.title}>
+        {_id ? `Edit User ${username}` : "Sign Up"}
+      </Text>
+      <Text style={styles.subtitle}>
+        {_id ? `` : "Login to the application"}
+      </Text>
       <TextInput
         style={styles.textInput}
         placeholder="Name"
@@ -116,6 +132,7 @@ export default function SignUp({ navigation, route }) {
       <TextInput
         style={styles.textInput}
         placeholder="Password"
+        secureTextEntry={true}
         onChangeText={(e) => onChange(e, "password")}
         defaultValue={password ? password : formData.password}
       />

@@ -24,13 +24,12 @@ export default function UsersList({ navigation }) {
 
   //#region services
 
-  const getUsers = async (data) => {
+  const getUsers = async () => {
     await axios
       .get(`${URL}/users/getAll`)
       .then((response) => {
         if (response.data) {
           setData(response.data);
-          users = data;
         } else {
           console.log("No hay datos para mostrar");
         }
@@ -39,6 +38,13 @@ export default function UsersList({ navigation }) {
         console.log(e);
       });
   };
+
+  function editUser(item) {
+    const findUser = data.find((x) => x._id === item._id);
+    if (data && findUser) {
+      navigation.navigate("Signup", { user: findUser });
+    }
+  }
   //#endregion
 
   //#region events
@@ -58,9 +64,15 @@ export default function UsersList({ navigation }) {
         <FlatList
           data={data}
           renderItem={({ item }) => (
-            <Text style={styles.item}>
-              {item.name} - {item.email} | Click to Edit
-            </Text>
+            <TouchableOpacity
+              onPress={() => {
+                editUser(item);
+              }}
+            >
+              <Text style={styles.item}>
+                {item.name} - {item.email} | Click to Edit
+              </Text>
+            </TouchableOpacity>
           )}
           keyExtractor={(item) => item._id}
         />

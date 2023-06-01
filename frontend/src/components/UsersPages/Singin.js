@@ -1,5 +1,6 @@
 import { Text, View, TextInput, TouchableOpacity } from "react-native";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import { Products } from "../../models/products";
 import { URL } from "../../environments/env";
 import { styles } from "../../style/style";
 import { Users } from "../../models/users";
@@ -7,11 +8,11 @@ import { useState } from "react";
 import React from "react";
 import axios from "axios";
 
-export default function SignIn({ navigation, route }) {
+export default function SignIn({ navigation }) {
   //#region atributos
-  let users = [];
-  let user = new Users();
-  // let auth = false;
+  let users;
+  let user;
+  let product = new Products();
 
   const [formData, setFormData] = useState(new Users());
   const [errorMess, setErrorMess] = useState("");
@@ -27,16 +28,17 @@ export default function SignIn({ navigation, route }) {
   //#region services
   //get one by email for login
   const getByEmail = async () => {
-    await axios
-      .get(`${URL}/users/getByEmail/${formData.email}`)
-      .then((response) => {
-        if (response.data) {
+    if (formData.email !== "" && formData.password !== "") {
+      await axios
+        .get(`${URL}/users/getByEmail/${formData.email}`)
+        .then((response) => {
           user = response.data;
           if (user.password === formData.password) {
             setErrorMess("Iniciando sesion...");
             setTimeout(() => {
               navigation.navigate("Products", {
                 user: user,
+                product: product,
               });
               setErrorMess("");
             }, 1500);
@@ -47,20 +49,20 @@ export default function SignIn({ navigation, route }) {
               setErrorMess("");
             }, 1500);
           }
-        } else {
-          setErrorMess("No hay datos para mostrar");
+        })
+        .catch((e) => {
+          setErrorMess(e);
+          console.log(e);
           setTimeout(() => {
             setErrorMess("");
           }, 1500);
-        }
-      })
-      .catch((e) => {
-        setErrorMess(e);
-        console.log(e);
-        setTimeout(() => {
-          setErrorMess("");
-        }, 1500);
-      });
+        });
+    } else {
+      setErrorMess("Todos los campos son obligatorios.");
+      setTimeout(() => {
+        setErrorMess("");
+      }, 2000);
+    }
     reset();
   };
   //#endregion
@@ -86,6 +88,7 @@ export default function SignIn({ navigation, route }) {
       <TextInput
         style={styles.textInput}
         placeholder="Password"
+        secureTextEntry={true}
         onChangeText={(e) => onChange(e, "password")}
         defaultValue={formData.password}
       />
