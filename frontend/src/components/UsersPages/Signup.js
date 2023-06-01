@@ -1,17 +1,26 @@
 import { Text, View, TextInput, TouchableOpacity } from "react-native";
-import { useForm, Controller } from "react-hook-form";
-import { URL } from "../../environments/env";
+import { useForm } from "react-hook-form";
 import { styles } from "../../style/style";
 import { Users } from "../../models/users";
 import { useState } from "react";
-import React from "react";
-import axios from "axios";
+import { UsersService } from "../../service/UsersService";
+import { NavigationService } from "../../service/NavigationService";
+import { StorageData } from "../../service/StorageDataService";
 
-export default function SignUp({ navigation, route }) {
+// localstorage
+const USERS_INFO = "@userInfo";
+const AUTH_INFO = "@authInfo";
+const PRODUCT_INFO = "@productInfo";
+const SALE_INFO = "@saleInfo";
+
+export default function SignUp({ navigation }) {
   //#region atributos
-  let users = [];
   let user = new Users();
-  let { _id, name, username, email, password } = route.params.user;
+  let users = [];
+
+  const userService = new UsersService();
+  const navigationService = new NavigationService();
+  const storageData = new StorageData();
 
   const [formData, setFormData] = useState(new Users());
   const [errorMess, setErrorMess] = useState("");
@@ -19,79 +28,45 @@ export default function SignUp({ navigation, route }) {
   const { handleSubmit, reset } = useForm({
     defaultValues: new Users(),
   });
-
   //#endregion
 
   //#region functions
 
+  const getUser = async () => {
+    const dataUser = await storageData.getDataStorage(USERS_INFO, users);
+    console.log(dataUser);
+  };
+
   //#region services
   //create user
   const createUser = async () => {
-    if (
-      formData.name !== "" &&
-      formData.username !== "" &&
-      formData.email !== "" &&
-      formData.password !== ""
-    ) {
-      await axios
-        .post(`${URL}/users/create`, formData)
-        .then((response) => {
-          if (response) {
-            setErrorMess("Usuario ingresado con exito.");
-            setTimeout(() => {
-              navigation.navigate("Signin");
-              setErrorMess("");
-            }, 2000);
-          }
-        })
-        .catch((e) => {
-          console.log(e);
-          setErrorMess(e);
+    userService
+      .createUser()
+      .then((response) => {
+        if (response) {
+          setErrorMess("Usuario ingresado con exito.");
           setTimeout(() => {
             setErrorMess("");
+            navigationService.logout({ navigation });
           }, 2000);
-        });
-    } else {
-      setErrorMess("Todos los campos son obligatorios.");
-      setTimeout(() => {
-        setErrorMess("");
-      }, 2000);
-    }
-    reset();
+        }
+      })
+      .catch((e) => console.log(e));
   };
 
   const editUser = async () => {
-    if (
-      formData.name !== "" &&
-      formData.username !== "" &&
-      formData.email !== "" &&
-      formData.password !== ""
-    ) {
-      await axios
-        .put(`${URL}/users/update`, formData)
-        .then((response) => {
-          if (response) {
-            setErrorMess("Usuario ingresado con exito.");
-            setTimeout(() => {
-              navigation.navigate("Signin");
-              setErrorMess("");
-            }, 2000);
-          }
-        })
-        .catch((e) => {
-          console.log(e);
-          setErrorMess(e);
+    userService
+      .updateUser(formData)
+      .then((response) => {
+        if (response) {
+          setErrorMess("Usuario actualizado con exito.");
           setTimeout(() => {
             setErrorMess("");
+            navigationService.navigateUsersList({ navigation });
           }, 2000);
-        });
-    } else {
-      setErrorMess("Todos los campos son obligatorios.");
-      setTimeout(() => {
-        setErrorMess("");
-      }, 2000);
-    }
-    reset();
+        }
+      })
+      .catch((e) => console.log(e));
   };
   //#endregion
 
@@ -101,61 +76,69 @@ export default function SignUp({ navigation, route }) {
   };
   //#endregion
 
+  getUser();
   //#endregion
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
-        {_id ? `Edit User ${username}` : "Sign Up"}
+        {user._id ? `Edit User ${username}` : "Sign Up"}
       </Text>
       <Text style={styles.subtitle}>
-        {_id ? `` : "Login to the application"}
+        {user._id ? `` : "Login to the application"}
       </Text>
       <TextInput
         style={styles.textInput}
         placeholder="Name"
         onChangeText={(e) => onChange(e, "name")}
-        defaultValue={name ? name : formData.name}
+        defaultValue={formData.name}
       />
       <TextInput
         style={styles.textInput}
         placeholder="Username"
         onChangeText={(e) => onChange(e, "username")}
-        defaultValue={username ? username : formData.username}
+        defaultValue={formData.username}
       />
       <TextInput
         style={styles.textInput}
         placeholder="Email"
         onChangeText={(e) => onChange(e, "email")}
-        defaultValue={email ? email : formData.email}
+        defaultValue={formData.email}
       />
       <TextInput
         style={styles.textInput}
         placeholder="Password"
         secureTextEntry={true}
         onChangeText={(e) => onChange(e, "password")}
-        defaultValue={password ? password : formData.password}
+        defaultValue={formData.password}
       />
       <TouchableOpacity
         style={styles.button}
-        onPress={_id ? handleSubmit(editUser) : handleSubmit(createUser)}
+        onPress={() => {
+          if (
+            formData.name !== "" &&
+            formData.username !== "" &&
+            formData.email !== "" &&
+            formData.password !== ""
+          ) {
+            user._id ? editUser() : createUser();
+          } else {
+            setErrorMess("Todos los campos son obligatorios.");
+            setTimeout(() => {
+              setErrorMess("");
+            }, 2000);
+          }
+        }}
       >
-        <Text>{_id ? "Edit User" : "Sign Up"}</Text>
+        <Text>Sign Up</Text>
       </TouchableOpacity>
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate("Signin");
+          navigationService.navigateSignin({ navigation });
         }}
       >
         <Text style={styles.text}>¿Ya tienes una cuenta?</Text>
       </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() => {
-          navigation.navigate("UsersList");
-        }}
-      >
-        <Text style={styles.text}>Lista de usuarios</Text>
-      </TouchableOpacity>
+
       <Text style={{ fontWeight: "bold", marginTop: 10, color: "black" }}>
         {errorMess}
       </Text>

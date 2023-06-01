@@ -1,3 +1,4 @@
-const URL = `http://localhost:3200/api`;
+const port = 3200;
+const url = `http://localhost:${port}/api`;
 
-export { URL };
+export { url };

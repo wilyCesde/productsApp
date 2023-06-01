@@ -1,20 +1,17 @@
 import { Text, View, TextInput, TouchableOpacity } from "react-native";
 import { useForm } from "react-hook-form";
 import { Products } from "../../models/products";
-import { URL } from "../../environments/env";
+import { url } from "../../environments/env";
 import { styles } from "../../style/style";
 import { useState } from "react";
 import React from "react";
 import axios from "axios";
 
-export default function SignIn({ navigation, route }) {
+export default function SaleForm({ navigation, route }) {
   //#region atributos
   let products = [];
-  let product = new Products();
-
-  // let { username } = route.params.user;
-  console.log(route.params);
-  let { name, dateOfPreparation, price } = route.params.product;
+  let product = route.params.product;
+  let user = route.params.user;
 
   const [formData, setFormData] = useState(new Products());
   const [errorMess, setErrorMess] = useState("");
@@ -30,7 +27,7 @@ export default function SignIn({ navigation, route }) {
   //get one by email for login
   async function getAllProducts() {
     await axios
-      .get(`${URL}/products/getAll`)
+      .get(`${url}/products/getAll`)
       .then((response) => {
         products = response.data;
       })
@@ -55,7 +52,7 @@ export default function SignIn({ navigation, route }) {
           }, 2000);
         } else {
           await axios
-            .post(`${URL}/products/create`, formData)
+            .post(`${url}/products/create`, formData)
             .then((response) => {
               if (response.data) {
                 setErrorMess("Producto registrado con exito.");
@@ -100,7 +97,7 @@ export default function SignIn({ navigation, route }) {
         style={styles.textInput}
         placeholder="Name"
         onChangeText={(e) => onChange(e, "name")}
-        defaultValue={name ? name : formData.name}
+        defaultValue={product.name ? product.name : formData.name}
       />
       <TextInput
         style={styles.textInput}
@@ -108,7 +105,9 @@ export default function SignIn({ navigation, route }) {
         onChangeText={(e) => onChange(e, "dateOfPreparation")}
         editable={false}
         defaultValue={
-          dateOfPreparation ? dateOfPreparation : formData.dateOfPreparation
+          product.dateOfPreparation
+            ? product.dateOfPreparation
+            : formData.dateOfPreparation
         }
       />
       <TextInput
@@ -116,7 +115,7 @@ export default function SignIn({ navigation, route }) {
         placeholder="Price"
         // keyboardType="numeric"
         onChangeText={(e) => onChange(e, "price")}
-        defaultValue={price ? price : formData.price}
+        defaultValue={product.price ? product.price : formData.price}
       />
       <TouchableOpacity
         style={styles.button}

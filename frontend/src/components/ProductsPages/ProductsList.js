@@ -5,13 +5,16 @@ import {
   FlatList,
   TouchableOpacity,
 } from "react-native";
-import { URL } from "../../environments/env";
+import { url } from "../../environments/env";
 import { styles } from "../../style/style";
 import { useState } from "react";
 import React from "react";
 import axios from "axios";
 import { Products } from "../../models/products";
 import { Users } from "../../models/users";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const USER_INFO = "@userInfo";
 
 export default function ProductsList({ navigation }) {
   //#region atributos
@@ -28,12 +31,10 @@ export default function ProductsList({ navigation }) {
 
   const getProducts = async () => {
     await axios
-      .get(`${URL}/products/getAll`)
+      .get(`${url}/products/getAll`)
       .then((response) => {
         if (response.data) {
           setData(response.data);
-        } else {
-          console.log("No hay datos para mostrar");
         }
       })
       .catch((e) => {
@@ -41,10 +42,14 @@ export default function ProductsList({ navigation }) {
       });
   };
 
-  function editProduct(item) {
+  async function editProduct(item) {
     const findProduct = data.find((x) => x._id === item._id);
     if (data && findProduct) {
-      navigation.navigate("Products", { product: findProduct, user: user });
+      await AsyncStorage.getItem(USER_INFO);
+      navigation.navigate("Products", {
+        product: findProduct,
+        user: user,
+      });
     }
   }
   //#endregion

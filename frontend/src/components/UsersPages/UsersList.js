@@ -5,38 +5,51 @@ import {
   FlatList,
   TouchableOpacity,
 } from "react-native";
-import { URL } from "../../environments/env";
 import { styles } from "../../style/style";
 import { Users } from "../../models/users";
 import { useState } from "react";
 import React from "react";
-import axios from "axios";
+import { UsersService } from "../../service/UsersService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+// localstorage
+const USERS_INFO = "@userInfo";
+const AUTH_INFO = "@authInfo";
+const PRODUCT_INFO = "@productInfo";
+const SALE_INFO = "@saleInfo";
 
 export default function UsersList({ navigation }) {
   //#region atributos
-  let users = [];
   let user = new Users();
 
-  const [data, setData] = useState([]);
+  const [users, setUsers] = useState([]);
+
+  const userService = new UsersService();
   //#endregion
 
   //#region functions
 
+  const usersData = async () => {
+    try {
+      await AsyncStorage.removeItem(USERS_INFO);
+      await AsyncStorage.setItem(USERS_INFO, JSON.stringify([user]));
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   //#region services
 
   const getUsers = async () => {
-    await axios
-      .get(`${URL}/users/getAll`)
+    await userService
+      .getAllUsers()
       .then((response) => {
         if (response.data) {
-          setData(response.data);
-        } else {
-          console.log("No hay datos para mostrar");
+          setUsers(response.data);
+          AsyncStorage.setItem(USERS_INFO, users);
         }
       })
-      .catch((e) => {
-        console.log(e);
-      });
+      .catch((e) => console.log(e));
   };
 
   function editUser(item) {

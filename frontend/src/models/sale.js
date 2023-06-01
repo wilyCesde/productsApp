@@ -1,4 +1,4 @@
-export class sale {
+export class Sale {
   username = "";
   product = "";
   price = "";
