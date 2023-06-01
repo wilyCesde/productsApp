@@ -3,21 +3,19 @@ import { styles } from "../../style/style";
 import React from "react";
 // service
 import { NavigationService } from "../../service/NavigationService";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Users } from "../../models/users";
 import { StorageData } from "../../service/StorageDataService";
+import { Auth } from "../../models/auth";
 // models
 
 // localstorage
 const USERS_INFO = "@userInfo";
 const AUTH_INFO = "@authInfo";
-const PRODUCT_INFO = "@productInfo";
-const SALE_INFO = "@saleInfo";
 
 export default function Menu({ navigation }) {
   let user = new Users();
   let users = [];
-  let auth;
+  let auth = new Auth();
   const navigationService = new NavigationService();
   const storageData = new StorageData();
 

@@ -6,17 +6,18 @@ import { useState } from "react";
 import { UsersService } from "../../service/UsersService";
 import { NavigationService } from "../../service/NavigationService";
 import { StorageData } from "../../service/StorageDataService";
+import { Auth } from "../../models/auth";
 
 // localstorage
 const USERS_INFO = "@userInfo";
 const AUTH_INFO = "@authInfo";
-const PRODUCT_INFO = "@productInfo";
-const SALE_INFO = "@saleInfo";
 
 export default function SignUp({ navigation }) {
   //#region atributos
-  let user = new Users();
-  let users = [];
+  const [users, setUsers] = useState([]);
+  const [user, setUser] = useState(new Users());
+  const [auth, setAuth] = useState([]);
+  const [authValidate, setAuthValidate] = useState(new Auth());
 
   const userService = new UsersService();
   const navigationService = new NavigationService();
@@ -34,7 +35,11 @@ export default function SignUp({ navigation }) {
 
   const getUser = async () => {
     const dataUser = await storageData.getDataStorage(USERS_INFO, users);
-    console.log(dataUser);
+    const authUser = await storageData.getDataStorage(AUTH_INFO, auth);
+    if (dataUser && authUser) {
+      setUser(dataUser);
+      authValidate(authUser);
+    }
   };
 
   //#region services
@@ -78,70 +83,79 @@ export default function SignUp({ navigation }) {
 
   getUser();
   //#endregion
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>
-        {user._id ? `Edit User ${username}` : "Sign Up"}
-      </Text>
-      <Text style={styles.subtitle}>
-        {user._id ? `` : "Login to the application"}
-      </Text>
-      <TextInput
-        style={styles.textInput}
-        placeholder="Name"
-        onChangeText={(e) => onChange(e, "name")}
-        defaultValue={formData.name}
-      />
-      <TextInput
-        style={styles.textInput}
-        placeholder="Username"
-        onChangeText={(e) => onChange(e, "username")}
-        defaultValue={formData.username}
-      />
-      <TextInput
-        style={styles.textInput}
-        placeholder="Email"
-        onChangeText={(e) => onChange(e, "email")}
-        defaultValue={formData.email}
-      />
-      <TextInput
-        style={styles.textInput}
-        placeholder="Password"
-        secureTextEntry={true}
-        onChangeText={(e) => onChange(e, "password")}
-        defaultValue={formData.password}
-      />
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => {
-          if (
-            formData.name !== "" &&
-            formData.username !== "" &&
-            formData.email !== "" &&
-            formData.password !== ""
-          ) {
-            user._id ? editUser() : createUser();
-          } else {
-            setErrorMess("Todos los campos son obligatorios.");
-            setTimeout(() => {
-              setErrorMess("");
-            }, 2000);
-          }
-        }}
-      >
-        <Text>Sign Up</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() => {
-          navigationService.navigateSignin({ navigation });
-        }}
-      >
-        <Text style={styles.text}>¿Ya tienes una cuenta?</Text>
-      </TouchableOpacity>
+  if (
+    user.name === null ||
+    user.name === undefined ||
+    user.password === null ||
+    user.password === undefined
+  ) {
+    navigationService.logout({ navigation });
+  } else {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>
+          {user._id ? `Edit User ${username}` : "Sign Up"}
+        </Text>
+        <Text style={styles.subtitle}>
+          {user._id ? `` : "Login to the application"}
+        </Text>
+        <TextInput
+          style={styles.textInput}
+          placeholder="Name"
+          onChangeText={(e) => onChange(e, "name")}
+          defaultValue={formData.name}
+        />
+        <TextInput
+          style={styles.textInput}
+          placeholder="Username"
+          onChangeText={(e) => onChange(e, "username")}
+          defaultValue={formData.username}
+        />
+        <TextInput
+          style={styles.textInput}
+          placeholder="Email"
+          onChangeText={(e) => onChange(e, "email")}
+          defaultValue={formData.email}
+        />
+        <TextInput
+          style={styles.textInput}
+          placeholder="Password"
+          secureTextEntry={true}
+          onChangeText={(e) => onChange(e, "password")}
+          defaultValue={formData.password}
+        />
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => {
+            if (
+              formData.name !== "" &&
+              formData.username !== "" &&
+              formData.email !== "" &&
+              formData.password !== ""
+            ) {
+              user._id ? editUser() : createUser();
+            } else {
+              setErrorMess("Todos los campos son obligatorios.");
+              setTimeout(() => {
+                setErrorMess("");
+              }, 2000);
+            }
+          }}
+        >
+          <Text>Sign Up</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            navigationService.navigateSignin({ navigation });
+          }}
+        >
+          <Text style={styles.text}>¿Ya tienes una cuenta?</Text>
+        </TouchableOpacity>
 
-      <Text style={{ fontWeight: "bold", marginTop: 10, color: "black" }}>
-        {errorMess}
-      </Text>
-    </View>
-  );
+        <Text style={{ fontWeight: "bold", marginTop: 10, color: "black" }}>
+          {errorMess}
+        </Text>
+      </View>
+    );
+  }
 }

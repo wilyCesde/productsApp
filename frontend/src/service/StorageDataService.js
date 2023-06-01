@@ -15,8 +15,16 @@ export class StorageData {
 
   postDataStorage = async (key, model) => {
     try {
-      await AsyncStorage.removeItem(key);
+      this.deleteDataStorage(key);
       await AsyncStorage.setItem(key, JSON.stringify([model]));
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  deleteDataStorage = async (key) => {
+    try {
+      await AsyncStorage.removeItem(key);
     } catch (e) {
       console.log(e);
     }

@@ -1,12 +1,9 @@
 import { Text, View, TextInput, TouchableOpacity } from "react-native";
 import { useForm } from "react-hook-form";
-import { Products } from "../../models/products";
 import { styles } from "../../style/style";
 import { Users } from "../../models/users";
 import { useState } from "react";
 import React from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Sale } from "../../models/sale";
 import { UsersService } from "../../service/UsersService";
 import { NavigationService } from "../../service/NavigationService";
 import { StorageData } from "../../service/StorageDataService";
@@ -20,13 +17,15 @@ const SALE_INFO = "@saleInfo";
 
 export default function SignIn({ navigation }) {
   //#region atributos
-  let users = [];
-  let user = new Users();
-  let auth = new Auth();
 
   const userService = new UsersService();
   const navigationService = new NavigationService();
   const storageData = new StorageData();
+
+  const [users, setUsers] = useState([]);
+  const [user, setUser] = useState(new Users());
+  const [auth, setAuth] = useState([]);
+  const [authValidate, setAuthValidate] = useState(new Auth());
 
   const [formData, setFormData] = useState(new Users());
   const [errorMess, setErrorMess] = useState("");
@@ -40,9 +39,11 @@ export default function SignIn({ navigation }) {
   //#region functions
   const getUser = async () => {
     const dataUser = await storageData.getDataStorage(USERS_INFO, users);
-    const authUser = await storageData.getDataStorage(USERS_INFO, auth);
-    console.log(authUser);
-    console.log(dataUser);
+    const authUser = await storageData.getDataStorage(AUTH_INFO, auth);
+    if (dataUser && authUser) {
+      setUser(dataUser);
+      setAuthValidate(authUser);
+    }
   };
 
   //#region services
@@ -51,8 +52,9 @@ export default function SignIn({ navigation }) {
       .getUserByEmail(formData.email)
       .then((response) => {
         if (response.data && formData.password === response.data.password) {
-          user = response.data;
-          auth.auth = true;
+          setUser(response.data);
+          setAuthValidate({ auth: true });
+
           const dataStorage = storageData.postDataStorage(USERS_INFO, user);
           const authValidate = storageData.postDataStorage(AUTH_INFO, auth);
 

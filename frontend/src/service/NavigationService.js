@@ -1,6 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+// localstorage
 const USERS_INFO = "@userInfo";
+const AUTH_INFO = "@authInfo";
 
 export class NavigationService {
   navigateMenu = ({ navigation }) => {
@@ -29,6 +31,7 @@ export class NavigationService {
   };
   logout = async ({ navigation }) => {
     await AsyncStorage.removeItem(USERS_INFO);
+    await AsyncStorage.removeItem(AUTH_INFO);
     navigation.navigate("Signin");
   };
 }

@@ -10,31 +10,37 @@ import { Users } from "../../models/users";
 import { useState } from "react";
 import React from "react";
 import { UsersService } from "../../service/UsersService";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { NavigationService } from "../../service/NavigationService";
+import { StorageData } from "../../service/StorageDataService";
+import { Auth } from "../../models/auth";
 
 // localstorage
 const USERS_INFO = "@userInfo";
 const AUTH_INFO = "@authInfo";
-const PRODUCT_INFO = "@productInfo";
-const SALE_INFO = "@saleInfo";
 
 export default function UsersList({ navigation }) {
   //#region atributos
-  let user = new Users();
+  const userService = new UsersService();
+  const navigationService = new NavigationService();
+  const storageData = new StorageData();
 
   const [users, setUsers] = useState([]);
+  const [user, setUser] = useState(new Users());
+  const [auth, setAuth] = useState([]);
+  const [authValidate, setAuthValidate] = useState(new Auth());
 
-  const userService = new UsersService();
+  const [errorMess, setErrorMess] = useState("");
+
   //#endregion
 
   //#region functions
 
-  const usersData = async () => {
-    try {
-      await AsyncStorage.removeItem(USERS_INFO);
-      await AsyncStorage.setItem(USERS_INFO, JSON.stringify([user]));
-    } catch (e) {
-      console.log(e);
+  const getUser = async () => {
+    const dataUser = await storageData.getDataStorage(USERS_INFO, users);
+    const authUser = await storageData.getDataStorage(AUTH_INFO, auth);
+    if (dataUser && authUser) {
+      setUser(dataUser);
+      setAuthValidate(authUser);
     }
   };
 
@@ -46,16 +52,20 @@ export default function UsersList({ navigation }) {
       .then((response) => {
         if (response.data) {
           setUsers(response.data);
-          AsyncStorage.setItem(USERS_INFO, users);
         }
       })
       .catch((e) => console.log(e));
   };
 
-  function editUser(item) {
-    const findUser = data.find((x) => x._id === item._id);
-    if (data && findUser) {
-      navigation.navigate("Signup", { user: findUser });
+  async function editUser(item) {
+    const findUser = users.find((x) => x._id === item._id);
+    if (users && findUser) {
+      const dataStorage = storageData.postDataStorage(USERS_INFO, findUser);
+      if (dataStorage) {
+        setTimeout(() => {
+          navigationService.navigateSignup({ navigation });
+        }, 1500);
+      }
     }
   }
   //#endregion
@@ -64,6 +74,8 @@ export default function UsersList({ navigation }) {
   //#endregion
 
   //#endregion
+
+  getUser();
 
   //#region front ("HTML")
   return (
@@ -75,7 +87,7 @@ export default function UsersList({ navigation }) {
 
       <SafeAreaView style={styles.container}>
         <FlatList
-          data={data}
+          data={users}
           renderItem={({ item }) => (
             <TouchableOpacity
               onPress={() => {
@@ -90,6 +102,9 @@ export default function UsersList({ navigation }) {
           keyExtractor={(item) => item._id}
         />
       </SafeAreaView>
+      <Text style={{ fontWeight: "bold", marginTop: 10, color: "black" }}>
+        {errorMess}
+      </Text>
     </View>
   );
 }
