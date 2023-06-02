@@ -123,7 +123,16 @@ export default function SaleFrom({ navigation, route }) {
         setSelected={(value) => {
           if (value) sale.product = value;
         }}
-        onSelect={() => console.log(sale)}
+        onSelect={async (value) => {
+          await productsService
+            .getProductByName(value)
+            .then((response) => {
+              if (response) {
+                sale.price = response.data.price;
+              }
+            })
+            .catch((e) => console.log(e));
+        }}
         data={products}
         save="value"
       />
@@ -132,7 +141,6 @@ export default function SaleFrom({ navigation, route }) {
           if (value) sale.username = value;
           console.log(sale);
         }}
-        onSelect={() => console.log(sale)}
         data={users}
         save="value"
       />

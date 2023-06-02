@@ -10,6 +10,10 @@ export class ProductsService {
   getProductById = async (id) => {
     return await axios.get(`${url}/products/getById/${id}`);
   };
+  //byName
+  getProductByName = async (name) => {
+    return await axios.get(`${url}/products/getByName/${name}`);
+  };
   // create
   createProduct = async (product) => {
     return await axios.post(`${url}/products/create`, product);

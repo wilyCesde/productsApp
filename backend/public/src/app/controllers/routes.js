@@ -102,6 +102,15 @@ router.get("/products/getById/:id", cors(), (req, res) => {
     .catch((error) => res.json({ message: error }));
 });
 
+// getByName
+router.get("/products/getByName/:name", cors(), (req, res) => {
+  const { name } = req.params;
+  productsSchema
+    .findOne({ name: name })
+    .then((data) => res.json(data))
+    .catch((error) => res.json({ message: error }));
+});
+
 // create
 router.post("/products/create", cors(), (req, res) => {
   const products = productsSchema(req.body);
