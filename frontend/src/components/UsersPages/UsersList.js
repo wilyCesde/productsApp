@@ -78,10 +78,11 @@ export default function UsersList({ navigation }) {
     if (users && findUser) {
       user = findUser;
       if (user) {
+        setErrorMess("Usuario seleccionado...");
         setTimeout(() => {
-          setErrorMess("Usuario seleccionado...");
           navigationService.navigateSignup({ navigation }, user);
-        }, 1000);
+          setErrorMess("");
+        }, 1500);
       }
     } else {
       setErrorMess("Intenta nuevamente.");
@@ -121,9 +122,7 @@ export default function UsersList({ navigation }) {
           keyExtractor={(item) => item._id}
         />
       </SafeAreaView>
-      <Text style={{ fontWeight: "bold", marginTop: 10, color: "black" }}>
-        {errorMess}
-      </Text>
+      <Text style={{ fontWeight: "bold", color: "black" }}>{errorMess}</Text>
     </View>
   );
 }
