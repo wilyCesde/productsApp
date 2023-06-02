@@ -46,7 +46,7 @@ export default function SignUp({ navigation, route }) {
   //create user
   const createUser = async () => {
     userService
-      .createUser()
+      .createUser(formData)
       .then((response) => {
         if (response) {
           setErrorMess("Usuario ingresado con exito.");

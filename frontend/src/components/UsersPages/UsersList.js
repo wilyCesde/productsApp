@@ -122,6 +122,14 @@ export default function UsersList({ navigation }) {
           keyExtractor={(item) => item._id}
         />
       </SafeAreaView>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => {
+          navigationService.navigateMenu({ navigation });
+        }}
+      >
+        <Text>Volver al menú</Text>
+      </TouchableOpacity>
       <Text style={{ fontWeight: "bold", color: "black" }}>{errorMess}</Text>
     </View>
   );

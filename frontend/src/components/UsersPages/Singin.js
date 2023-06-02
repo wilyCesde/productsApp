@@ -12,8 +12,6 @@ import { Auth } from "../../models/auth";
 // localstorage
 const USERS_INFO = "@userInfo";
 const AUTH_INFO = "@authInfo";
-const PRODUCT_INFO = "@productInfo";
-const SALE_INFO = "@saleInfo";
 
 export default function SignIn({ navigation }) {
   //#region atributos

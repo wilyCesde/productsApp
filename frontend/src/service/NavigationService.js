@@ -8,8 +8,8 @@ export class NavigationService {
   navigateMenu = ({ navigation }) => {
     navigation.navigate("Menu");
   };
-  navigateProductsForm = ({ navigation }) => {
-    navigation.navigate("ProductsForm");
+  navigateProductsForm = ({ navigation }, params) => {
+    navigation.navigate("ProductsForm", { info: params });
   };
   navigateProductsList = ({ navigation }) => {
     navigation.navigate("ProductsList");
@@ -24,7 +24,7 @@ export class NavigationService {
     navigation.navigate("Signin");
   };
   navigateSignup = ({ navigation }, params) => {
-    navigation.navigate("Signup", {info: params});
+    navigation.navigate("Signup", { info: params });
   };
   navigateUsersList = ({ navigation }) => {
     navigation.navigate("UsersList");
