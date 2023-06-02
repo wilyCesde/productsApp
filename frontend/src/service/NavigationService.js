@@ -23,8 +23,8 @@ export class NavigationService {
   navigateSignin = ({ navigation }) => {
     navigation.navigate("Signin");
   };
-  navigateSignup = ({ navigation }) => {
-    navigation.navigate("Signup");
+  navigateSignup = ({ navigation }, params) => {
+    navigation.navigate("Signup", {info: params});
   };
   navigateUsersList = ({ navigation }) => {
     navigation.navigate("UsersList");

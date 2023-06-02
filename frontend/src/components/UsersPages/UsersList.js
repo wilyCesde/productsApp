@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import { styles } from "../../style/style";
 import { Users } from "../../models/users";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import React from "react";
 import { UsersService } from "../../service/UsersService";
 import { NavigationService } from "../../service/NavigationService";
@@ -27,7 +27,9 @@ export default function UsersList({ navigation }) {
   let userStorage = new Users();
   let usersStorage = [];
 
-  const [user, setUser] = useState(new Users());
+  let user = new Users();
+  // let users = [];
+
   const [users, setUsers] = useState([]);
   const [auth, setAuth] = useState([]);
   const [authValidate, setAuthValidate] = useState(new Auth());
@@ -42,7 +44,7 @@ export default function UsersList({ navigation }) {
 
   const getUsersStorage = async () => {
     await storageData
-      .getDataStorage(USERS_INFO, usersStorage)
+      .getDataStorage(USERS_INFO)
       .then((response) => {
         if (response) {
           usersStorage = JSON.parse(response);
@@ -74,17 +76,13 @@ export default function UsersList({ navigation }) {
   async function editUser(item) {
     const findUser = users.find((x) => x._id === item._id);
     if (users && findUser) {
-      await storageData
-        .postDataStorage(USERS_INFO, findUser)
-        .then((response) => {
-          if (response) {
-            console.log(response);
-            setTimeout(() => {
-              navigationService.navigateSignup({ navigation });
-            }, 1500);
-          }
-        })
-        .catch((e) => console.log(e));
+      user = findUser;
+      if (user) {
+        setTimeout(() => {
+          setErrorMess("Usuario seleccionado...");
+          navigationService.navigateSignup({ navigation }, user);
+        }, 1000);
+      }
     } else {
       setErrorMess("Intenta nuevamente.");
     }
@@ -92,11 +90,13 @@ export default function UsersList({ navigation }) {
   //#endregion
 
   //#region events
+  useEffect(() => {
+    getUsersStorage();
+  }, []);
   //#endregion
 
   //#endregion
   //#region front ("HTML")
-  getUsersStorage();
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Users List</Text>

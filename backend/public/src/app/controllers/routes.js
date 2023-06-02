@@ -61,9 +61,9 @@ router.post("/users/create", cors(), (req, res) => {
 router.put("/users/update/:id", cors(), (req, res) => {
   try {
     const { id } = req.params;
-    const { name, age, email } = req.body;
+    const { name, username, email, passsword } = req.body;
     userSchema
-      .updateOne({ _id: id }, { $set: { name, age, email } })
+      .updateOne({ _id: id }, { $set: { name, username, email, passsword } })
       .then((data) => res.json(data))
       .catch((error) => res.json({ message: error }));
   } catch (error) {
@@ -71,7 +71,7 @@ router.put("/users/update/:id", cors(), (req, res) => {
   }
 });
 // Eliminar user por id
-router.delete("/users/delet/:id", cors(), (req, res) => {
+router.delete("/users/delete/:id", cors(), (req, res) => {
   try {
     const { id } = req.params;
     userSchema

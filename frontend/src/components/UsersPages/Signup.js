@@ -2,7 +2,7 @@ import { Text, View, TextInput, TouchableOpacity } from "react-native";
 import { useForm } from "react-hook-form";
 import { styles } from "../../style/style";
 import { Users } from "../../models/users";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { UsersService } from "../../service/UsersService";
 import { NavigationService } from "../../service/NavigationService";
 import { StorageData } from "../../service/StorageDataService";
@@ -12,7 +12,7 @@ import { Auth } from "../../models/auth";
 const USERS_INFO = "@userInfo";
 const AUTH_INFO = "@authInfo";
 
-export default function SignUp({ navigation }) {
+export default function SignUp({ navigation, route }) {
   //#region atributos
   const [users, setUsers] = useState([]);
   const [user, setUser] = useState(new Users());
@@ -34,8 +34,8 @@ export default function SignUp({ navigation }) {
   //#region functions
 
   const getUser = async () => {
-    const dataUser = await storageData.getDataStorage(USERS_INFO, users);
-    const authUser = await storageData.getDataStorage(AUTH_INFO, auth);
+    const dataUser = await storageData.getDataStorage(USERS_INFO);
+    const authUser = await storageData.getDataStorage(AUTH_INFO);
     if (dataUser && authUser) {
       setUsers(dataUser);
       setAuth(authUser);
@@ -61,7 +61,7 @@ export default function SignUp({ navigation }) {
 
   const editUser = async () => {
     userService
-      .updateUser(formData)
+      .updateUser(user._id, formData)
       .then((response) => {
         if (response) {
           setErrorMess("Usuario actualizado con exito.");
@@ -79,9 +79,13 @@ export default function SignUp({ navigation }) {
   const onChange = (e, type) => {
     setFormData({ ...formData, [type]: e });
   };
+
+  useEffect(() => {
+    setUser(route.params.info);
+    getUser();
+  }, []);
   //#endregion
 
-  getUser();
   //#endregion
   if (
     user.name === null ||
@@ -94,7 +98,7 @@ export default function SignUp({ navigation }) {
     return (
       <View style={styles.container}>
         <Text style={styles.title}>
-          {user._id ? `Edit User ${username}` : "Sign Up"}
+          {user._id ? `Edit User ${user.username}` : "Sign Up"}
         </Text>
         <Text style={styles.subtitle}>
           {user._id ? `` : "Login to the application"}
@@ -103,26 +107,26 @@ export default function SignUp({ navigation }) {
           style={styles.textInput}
           placeholder="Name"
           onChangeText={(e) => onChange(e, "name")}
-          defaultValue={formData.name}
+          defaultValue={user.name ? user.name : formData.name}
         />
         <TextInput
           style={styles.textInput}
           placeholder="Username"
           onChangeText={(e) => onChange(e, "username")}
-          defaultValue={formData.username}
+          defaultValue={user.username ? user.username : formData.username}
         />
         <TextInput
           style={styles.textInput}
           placeholder="Email"
           onChangeText={(e) => onChange(e, "email")}
-          defaultValue={formData.email}
+          defaultValue={user.email ? user.email : formData.email}
         />
         <TextInput
           style={styles.textInput}
           placeholder="Password"
           secureTextEntry={true}
           onChangeText={(e) => onChange(e, "password")}
-          defaultValue={formData.password}
+          defaultValue={user.password ? user.password : formData.password}
         />
         <TouchableOpacity
           style={styles.button}
@@ -142,14 +146,18 @@ export default function SignUp({ navigation }) {
             }
           }}
         >
-          <Text>Sign Up</Text>
+          <Text> {user._id ? `Update` : "Sign Up"}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
-            navigationService.navigateSignin({ navigation });
+            user._id
+              ? navigationService.navigateMenu({ navigation })
+              : navigationService.navigateSignin({ navigation });
           }}
         >
-          <Text style={styles.text}>¿Ya tienes una cuenta?</Text>
+          <Text style={styles.text}>
+            {user._id ? `Volver al menú` : "¿Ya tienes cuenta?"}
+          </Text>
         </TouchableOpacity>
 
         <Text style={{ fontWeight: "bold", marginTop: 10, color: "black" }}>

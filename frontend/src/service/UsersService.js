@@ -19,11 +19,11 @@ export class UsersService {
     return await axios.post(`${url}/users/create`, user);
   };
   // update
-  updateUser = async (user) => {
-    return await axios.put(`${url}/users/create`, user);
+  updateUser = async (id, user) => {
+    return await axios.put(`${url}/users/update/${id}`, user);
   };
   // delete
   deleteUser = async (id) => {
-    return await axios.delete(`${url}/users/create/${id}`);
+    return await axios.delete(`${url}/users/delete/${id}`);
   };
 }
