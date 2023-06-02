@@ -24,8 +24,11 @@ export default function UsersList({ navigation }) {
   const navigationService = new NavigationService();
   const storageData = new StorageData();
 
-  const [users, setUsers] = useState([]);
+  let userStorage = new Users();
+  let usersStorage = [];
+
   const [user, setUser] = useState(new Users());
+  const [users, setUsers] = useState([]);
   const [auth, setAuth] = useState([]);
   const [authValidate, setAuthValidate] = useState(new Auth());
 
@@ -35,14 +38,25 @@ export default function UsersList({ navigation }) {
 
   //#region functions
 
-  const getUser = async () => {
-    const dataUser = await storageData.getDataStorage(USERS_INFO, users);
-    const authUser = await storageData.getDataStorage(AUTH_INFO, auth);
-    if (dataUser && authUser) {
-      setUser(dataUser);
-      setAuthValidate(authUser);
-    }
+  //#region storage
+
+  const getUsersStorage = async () => {
+    await storageData
+      .getDataStorage(USERS_INFO, usersStorage)
+      .then((response) => {
+        if (response) {
+          usersStorage = JSON.parse(response);
+          if (users) {
+            userStorage = usersStorage[0];
+          }
+        } else {
+          navigationService.logout({ navigation });
+        }
+      })
+      .catch((e) => console.log(e));
   };
+
+  //#endregion
 
   //#region services
 
@@ -60,12 +74,19 @@ export default function UsersList({ navigation }) {
   async function editUser(item) {
     const findUser = users.find((x) => x._id === item._id);
     if (users && findUser) {
-      const dataStorage = storageData.postDataStorage(USERS_INFO, findUser);
-      if (dataStorage) {
-        setTimeout(() => {
-          navigationService.navigateSignup({ navigation });
-        }, 1500);
-      }
+      await storageData
+        .postDataStorage(USERS_INFO, findUser)
+        .then((response) => {
+          if (response) {
+            console.log(response);
+            setTimeout(() => {
+              navigationService.navigateSignup({ navigation });
+            }, 1500);
+          }
+        })
+        .catch((e) => console.log(e));
+    } else {
+      setErrorMess("Intenta nuevamente.");
     }
   }
   //#endregion
@@ -74,10 +95,8 @@ export default function UsersList({ navigation }) {
   //#endregion
 
   //#endregion
-
-  getUser();
-
   //#region front ("HTML")
+  getUsersStorage();
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Users List</Text>

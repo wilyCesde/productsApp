@@ -37,8 +37,8 @@ export default function SignUp({ navigation }) {
     const dataUser = await storageData.getDataStorage(USERS_INFO, users);
     const authUser = await storageData.getDataStorage(AUTH_INFO, auth);
     if (dataUser && authUser) {
-      setUser(dataUser);
-      authValidate(authUser);
+      setUsers(dataUser);
+      setAuth(authUser);
     }
   };
 

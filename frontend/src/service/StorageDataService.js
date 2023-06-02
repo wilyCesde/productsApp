@@ -2,31 +2,18 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export class StorageData {
   getDataStorage = async (key, array) => {
-    try {
-      array = await AsyncStorage.getItem(key);
-      if (array !== null) {
-        // console.log(JSON.parse(array));
-        return JSON.parse(array);
-      }
-    } catch (e) {
-      console.log(e);
-    }
+    return (array = await AsyncStorage.getItem(key));
   };
 
   postDataStorage = async (key, model) => {
-    try {
-      this.deleteDataStorage(key);
-      await AsyncStorage.setItem(key, JSON.stringify([model]));
-    } catch (e) {
-      console.log(e);
+    const deleted = this.deleteDataStorage(key);
+    if (deleted) {
+      return await AsyncStorage.setItem(key, JSON.stringify([model]));
     }
   };
 
   deleteDataStorage = async (key) => {
-    try {
-      await AsyncStorage.removeItem(key);
-    } catch (e) {
-      console.log(e);
-    }
+    await AsyncStorage.removeItem(key);
+    return true;
   };
 }
