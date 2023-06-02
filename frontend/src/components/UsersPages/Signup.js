@@ -16,8 +16,6 @@ export default function SignUp({ navigation, route }) {
   //#region atributos
   const [users, setUsers] = useState([]);
   const [user, setUser] = useState(new Users());
-  const [auth, setAuth] = useState([]);
-  const [authValidate, setAuthValidate] = useState(new Auth());
 
   const userService = new UsersService();
   const navigationService = new NavigationService();

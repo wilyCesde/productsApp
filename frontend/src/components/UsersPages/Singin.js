@@ -7,11 +7,9 @@ import React from "react";
 import { UsersService } from "../../service/UsersService";
 import { NavigationService } from "../../service/NavigationService";
 import { StorageData } from "../../service/StorageDataService";
-import { Auth } from "../../models/auth";
 
 // localstorage
 const USERS_INFO = "@userInfo";
-const AUTH_INFO = "@authInfo";
 
 export default function SignIn({ navigation }) {
   //#region atributos
@@ -25,9 +23,6 @@ export default function SignIn({ navigation }) {
 
   let user = new Users();
   let users = [];
-
-  const [auth, setAuth] = useState([]);
-  const [authValidate, setAuthValidate] = useState({});
 
   const [formData, setFormData] = useState(new Users());
   const [errorMess, setErrorMess] = useState("");
@@ -81,7 +76,6 @@ export default function SignIn({ navigation }) {
       .then((response) => {
         if (response.data && formData.password === response.data.password) {
           user = response.data;
-          setAuthValidate({ auth: true });
           if (user) {
             postUsersStorage();
           }

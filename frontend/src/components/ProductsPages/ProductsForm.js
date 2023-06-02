@@ -5,27 +5,23 @@ import { Users } from "../../models/users";
 import { useEffect, useState } from "react";
 import { NavigationService } from "../../service/NavigationService";
 import { StorageData } from "../../service/StorageDataService";
-import { Auth } from "../../models/auth";
 import { Products } from "../../models/products";
 import { ProductsService } from "../../service/ProductsService";
 
 // localstorage
 const AUTH_INFO = "@authInfo";
 const PRODUCT_INFO = "@productInfo";
-const SALE_INFO = "@saleInfo";
 
 export default function ProductsForm({ navigation, route }) {
   //#region atributos
   const [products, setProducts] = useState([]);
   const [product, setProduct] = useState(new Products());
-  const [auth, setAuth] = useState([]);
-  const [authValidate, setAuthValidate] = useState(new Auth());
 
   const productsService = new ProductsService();
   const navigationService = new NavigationService();
   const storageData = new StorageData();
 
-  const [formData, setFormData] = useState(new Users());
+  const [formData, setFormData] = useState(product);
   const [errorMess, setErrorMess] = useState("");
 
   const { handleSubmit, reset } = useForm({
@@ -103,17 +99,6 @@ export default function ProductsForm({ navigation, route }) {
       />
       <TextInput
         style={styles.textInput}
-        placeholder="Date"
-        editable={false}
-        // onChangeText={(e) => onChange(e, "dateOfPreparation")}
-        defaultValue={
-          product.dateOfPreparation
-            ? product.dateOfPreparation
-            : formData.dateOfPreparation
-        }
-      />
-      <TextInput
-        style={styles.textInput}
         placeholder="Price"
         onChangeText={(e) => onChange(e, "price")}
         defaultValue={product.price ? product.price : formData.price}
@@ -136,12 +121,12 @@ export default function ProductsForm({ navigation, route }) {
       <TouchableOpacity
         onPress={() => {
           product._id
-            ? navigationService.navigateProductsList({ navigation })
-            : navigationService.navigateMenu({ navigation });
+            ? navigationService.navigateMenu({ navigation })
+            : navigationService.navigateProductsList({ navigation });
         }}
       >
         <Text style={styles.text}>
-          {product._id ? `Seleccionar productos` : "Volver al menú"}
+          {product._id ? "Volver al menú" : `Seleccionar productos`}
         </Text>
       </TouchableOpacity>
 

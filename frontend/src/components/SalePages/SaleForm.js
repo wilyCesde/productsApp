@@ -1,83 +1,103 @@
 import { Text, View, TextInput, TouchableOpacity } from "react-native";
 import { useForm } from "react-hook-form";
-import { Products } from "../../models/products";
-import { url } from "../../environments/env";
 import { styles } from "../../style/style";
-import { useState } from "react";
-import React from "react";
-import axios from "axios";
+import { Users } from "../../models/users";
+import { useEffect, useState } from "react";
+import { NavigationService } from "../../service/NavigationService";
+import { Sale } from "../../models/sale";
+import { SaleService } from "../../service/SaleService";
+import { Products } from "../../models/products";
+import { SelectList } from "react-native-dropdown-select-list";
+import { UsersService } from "../../service/UsersService";
+import { ProductsService } from "../../service/ProductsService";
 
-export default function SaleForm({ navigation, route }) {
+// localstorage
+const PRODUCT_INFO = "@productInfo";
+const SALE_INFO = "@saleInfo";
+
+export default function SaleFrom({ navigation, route }) {
   //#region atributos
-  let products = [];
-  let product = route.params.product;
-  let user = route.params.user;
+  // const [sales, setSales] = useState([]);
+  // const [sale, setSale] = useState(new Sale());
+  let sale = new Sale();
+  let sales = [];
 
-  const [formData, setFormData] = useState(new Products());
+  const [products, setProducts] = useState([]);
+  const [users, setUsers] = useState([]);
+
+  const [selected, setSelected] = useState([]);
+
+  const navigationService = new NavigationService();
+  const saleService = new SaleService();
+  const userService = new UsersService();
+  const productsService = new ProductsService();
+
+  const [formData, setFormData] = useState(sale);
   const [errorMess, setErrorMess] = useState("");
 
   const { handleSubmit, reset } = useForm({
-    defaultValues: new Products(),
+    defaultValues: new Users(),
   });
   //#endregion
 
   //#region functions
 
   //#region services
-  //get one by email for login
-  async function getAllProducts() {
-    await axios
-      .get(`${url}/products/getAll`)
+  const getUsers = async () => {
+    await userService
+      .getAllUsers()
       .then((response) => {
-        products = response.data;
+        if (response.data) {
+          let newArray = response.data.map((item) => {
+            return { key: item.id, value: item.username };
+          });
+          if (newArray) setUsers(newArray);
+        }
       })
-      .catch((e) => {
-        setErrorMess(e);
-        console.log(e);
-        setTimeout(() => {
-          setErrorMess("");
-        }, 1500);
-      });
-  }
-
-  const createProduct = async () => {
-    getAllProducts();
-    if (formData.name !== "" && formData.price !== "") {
-      if (products) {
-        const findProduct = products.find((x) => x.name === formData.name);
-        if (findProduct) {
-          setErrorMess("El producto ya esta registrado");
+      .catch((e) => console.log(e));
+  };
+  const getProducts = async () => {
+    await productsService
+      .getAllProducts()
+      .then((response) => {
+        if (response.data) {
+          let newArray = response.data.map((item) => {
+            return { key: item._id, value: item.name };
+          });
+          if (newArray) setProducts(newArray);
+        }
+      })
+      .catch((e) => console.log(e));
+  };
+  //create user
+  const createSale = async () => {
+    await saleService
+      .createSale(formData)
+      .then((response) => {
+        if (response) {
+          setErrorMess("Venta agregada con exito.");
           setTimeout(() => {
             setErrorMess("");
+            navigationService.logout({ navigation });
           }, 2000);
-        } else {
-          await axios
-            .post(`${url}/products/create`, formData)
-            .then((response) => {
-              if (response.data) {
-                setErrorMess("Producto registrado con exito.");
-                setTimeout(() => {
-                  setErrorMess("");
-                }, 2000);
-                reset();
-              }
-            })
-            .catch((e) => {
-              console.log(e);
-              setErrorMess(e);
-              setTimeout(() => {
-                setErrorMess("");
-              }, 2000);
-            });
         }
-      }
-    } else {
-      setErrorMess("Todos los campos son obligatorios.");
-      setTimeout(() => {
-        setErrorMess("");
-      }, 2000);
-    }
-    reset();
+      })
+      .catch((e) => console.log(e));
+  };
+
+  const updateSale = async () => {
+    await saleService
+      .updateSale(sale._id, formData)
+      .then((response) => {
+        if (response) {
+          setErrorMess("Venta actualizada con exito.");
+          setTimeout(() => {
+            setErrorMess("");
+            navigationService.navigateUsersList({ navigation });
+          }, 2000);
+        }
+      })
+      .catch((e) => console.log(e));
   };
   //#endregion
 
@@ -85,51 +105,64 @@ export default function SaleForm({ navigation, route }) {
   const onChange = (e, type) => {
     setFormData({ ...formData, [type]: e });
   };
+
+  useEffect(() => {
+    getUsers();
+    getProducts();
+  }, []);
   //#endregion
 
   //#endregion
-
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Products</Text>
-      <Text style={styles.subtitle}>Create a product</Text>
-      <TextInput
-        style={styles.textInput}
-        placeholder="Name"
-        onChangeText={(e) => onChange(e, "name")}
-        defaultValue={product.name ? product.name : formData.name}
+      <Text style={styles.title}>{sale._id ? `Update` : "Add"}</Text>
+      <Text style={styles.subtitle}>
+        {sale._id ? `` : "Ingresa un producto"}
+      </Text>
+      <SelectList
+        setSelected={(value) => {
+          if (value) sale.product = value;
+        }}
+        onSelect={() => console.log(sale)}
+        data={products}
+        save="value"
       />
-      <TextInput
-        style={styles.textInput}
-        placeholder="DateOfPreparation"
-        onChangeText={(e) => onChange(e, "dateOfPreparation")}
-        editable={false}
-        defaultValue={
-          product.dateOfPreparation
-            ? product.dateOfPreparation
-            : formData.dateOfPreparation
-        }
-      />
-      <TextInput
-        style={styles.textInput}
-        placeholder="Price"
-        // keyboardType="numeric"
-        onChangeText={(e) => onChange(e, "price")}
-        defaultValue={product.price ? product.price : formData.price}
+      <SelectList
+        setSelected={(value) => {
+          if (value) sale.username = value;
+          console.log(sale);
+        }}
+        onSelect={() => console.log(sale)}
+        data={users}
+        save="value"
       />
       <TouchableOpacity
         style={styles.button}
-        onPress={handleSubmit(createProduct)}
+        onPress={() => {
+          if (formData.name !== "" && formData.price !== "") {
+            sale._id ? updateSale() : createSale();
+          } else {
+            setErrorMess("Todos los campos son obligatorios.");
+            setTimeout(() => {
+              setErrorMess("");
+            }, 2000);
+          }
+        }}
       >
-        <Text>Create</Text>
+        <Text> {sale._id ? `Update` : "Add"}</Text>
       </TouchableOpacity>
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate("ProductsList");
+          sale._id
+            ? navigationService.navigateMenu({ navigation })
+            : navigationService.navigateProductsList({ navigation });
         }}
       >
-        <Text style={styles.text}>Ver productos</Text>
+        <Text style={styles.text}>
+          {sale._id ? "Volver al menú" : `Seleccionar productos`}
+        </Text>
       </TouchableOpacity>
+
       <Text style={{ fontWeight: "bold", marginTop: 10, color: "black" }}>
         {errorMess}
       </Text>

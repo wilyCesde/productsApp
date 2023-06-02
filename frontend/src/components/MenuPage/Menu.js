@@ -61,7 +61,7 @@ export default function Menu({ navigation, route }) {
         <TouchableOpacity
           style={styles.button}
           onPress={() => {
-            navigationService.navigateSaleForm({ navigation });
+            navigationService.navigateSaleForm({ navigation }, {info:''});
           }}
         >
           <Text>Sale</Text>

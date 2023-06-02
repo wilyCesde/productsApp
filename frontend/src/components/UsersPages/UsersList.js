@@ -12,11 +12,9 @@ import React from "react";
 import { UsersService } from "../../service/UsersService";
 import { NavigationService } from "../../service/NavigationService";
 import { StorageData } from "../../service/StorageDataService";
-import { Auth } from "../../models/auth";
 
 // localstorage
 const USERS_INFO = "@userInfo";
-const AUTH_INFO = "@authInfo";
 
 export default function UsersList({ navigation }) {
   //#region atributos
@@ -31,9 +29,6 @@ export default function UsersList({ navigation }) {
   // let users = [];
 
   const [users, setUsers] = useState([]);
-  const [auth, setAuth] = useState([]);
-  const [authValidate, setAuthValidate] = useState(new Auth());
-
   const [errorMess, setErrorMess] = useState("");
 
   //#endregion

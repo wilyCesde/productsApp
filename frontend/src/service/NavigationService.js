@@ -14,8 +14,8 @@ export class NavigationService {
   navigateProductsList = ({ navigation }) => {
     navigation.navigate("ProductsList");
   };
-  navigateSaleForm = ({ navigation }) => {
-    navigation.navigate("SaleForm");
+  navigateSaleForm = ({ navigation }, params) => {
+    navigation.navigate("SaleForm", { info: params });
   };
   navigateSaleList = ({ navigation }) => {
     navigation.navigate("SaleList");
