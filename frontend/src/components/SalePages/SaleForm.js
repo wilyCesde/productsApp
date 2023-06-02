@@ -72,13 +72,13 @@ export default function SaleFrom({ navigation, route }) {
   //create user
   const createSale = async () => {
     await saleService
-      .createSale(formData)
+      .createSale(sale)
       .then((response) => {
         if (response) {
           setErrorMess("Venta agregada con exito.");
           setTimeout(() => {
             setErrorMess("");
-            navigationService.logout({ navigation });
+            navigationService.navigateSaleForm({ navigation });
           }, 2000);
         }
       })
@@ -125,10 +125,11 @@ export default function SaleFrom({ navigation, route }) {
         }}
         onSelect={async (value) => {
           await productsService
-            .getProductByName(value)
+            .getProductByName(sale.product)
             .then((response) => {
               if (response) {
                 sale.price = response.data.price;
+                console.log(sale);
               }
             })
             .catch((e) => console.log(e));
@@ -147,7 +148,7 @@ export default function SaleFrom({ navigation, route }) {
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
-          if (formData.name !== "" && formData.price !== "") {
+          if (sale.product !== "" && sale.price !== "") {
             sale._id ? updateSale() : createSale();
           } else {
             setErrorMess("Todos los campos son obligatorios.");
@@ -163,7 +164,7 @@ export default function SaleFrom({ navigation, route }) {
         onPress={() => {
           sale._id
             ? navigationService.navigateMenu({ navigation })
-            : navigationService.navigateProductsList({ navigation });
+            : navigationService.navigateSaleList({ navigation });
         }}
       >
         <Text style={styles.text}>
