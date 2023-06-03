@@ -57,12 +57,15 @@ export default function ProductsList({ navigation }) {
       await storageData
         .postDataStorage(PRODUCT_INFO, product)
         .then((response) => {
-          console.log(response);
-          setErrorMess("Producto seleccionado...");
-          setTimeout(() => {
-            navigationService.navigateProductsForm({ navigation });
-            setErrorMess("");
-          }, 2000);
+          if (response) {
+            console.log(response);
+          } else {
+            setErrorMess("Producto seleccionado...");
+            setTimeout(() => {
+              navigationService.navigateProductsForm({ navigation });
+              setErrorMess("");
+            }, 2000);
+          }
         })
         .catch((e) => console.log(e));
     }
@@ -78,20 +81,22 @@ export default function ProductsList({ navigation }) {
       .then((response) => {
         if (response.data) {
           setProducts(response.data);
+        } else {
+          console.log(response);
         }
       })
       .catch((e) => console.log(e));
   };
 
-  async function updateProduct(item) {
-    const findProduct = products.find((x) => x._id === item._id);
+  async function updateProduct(id) {
+    const findProduct = products.find((x) => x._id === id);
     if (products && findProduct) {
-      product = findProduct;
-      if (product) {
-        postProductStorage(product);
-      }
+      postProductStorage(findProduct);
     } else {
-      setErrorMess("Intenta nuevamente.");
+      setErrorMess("Intenta nuevamente...");
+      setTimeout(() => {
+        setErrorMess("");
+      }, 1000);
     }
   }
   //#endregion
@@ -100,8 +105,7 @@ export default function ProductsList({ navigation }) {
 
   useEffect(() => {
     getProductsStorage();
-    console.log(product);
-  }, []);
+  });
   //#endregion
 
   //#endregion
@@ -119,7 +123,7 @@ export default function ProductsList({ navigation }) {
           renderItem={({ item }) => (
             <TouchableOpacity
               onPress={() => {
-                updateProduct(item);
+                updateProduct(item._id);
               }}
             >
               <Text style={styles.item}>
@@ -127,7 +131,7 @@ export default function ProductsList({ navigation }) {
               </Text>
             </TouchableOpacity>
           )}
-          keyExtractor={(item) => item._id}
+          // keyExtractor={(item) => item._id}
         />
       </SafeAreaView>
       <TouchableOpacity

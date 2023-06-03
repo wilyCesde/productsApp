@@ -1,6 +1,7 @@
 const express = require("express");
 var cors = require("cors");
 
+// models
 const userSchema = require("../models/user");
 const productsSchema = require("../models/products");
 const saleSchema = require("../models/sale");

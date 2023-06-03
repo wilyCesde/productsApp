@@ -37,6 +37,7 @@ export default function ProductsForm({ navigation }) {
     await storageData
       .getDataStorage(PRODUCT_INFO)
       .then((response) => {
+        reset()
         if (response) {
           productsStorage = JSON.parse(response);
           if (productsStorage) {
@@ -45,8 +46,10 @@ export default function ProductsForm({ navigation }) {
               product = productStorage;
             }
           }
+          console.log(product);
         } else {
-          navigationService.navigateProductsForm({ navigation });
+          // navigationService.navigateProductsForm({ navigation });
+          console.log(response);
         }
       })
       .catch((e) => console.log(e));
@@ -92,7 +95,7 @@ export default function ProductsForm({ navigation }) {
 
   useEffect(() => {
     getProductsStorage();
-  }, []);
+  },[]);
   //#endregion
 
   //#endregion

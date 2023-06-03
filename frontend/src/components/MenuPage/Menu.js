@@ -10,7 +10,6 @@ import { Auth } from "../../models/auth";
 
 // localstorage
 const USERS_INFO = "@userInfo";
-const AUTH_INFO = "@authInfo";
 
 export default function Menu({ navigation, route }) {
   const navigationService = new NavigationService();
@@ -19,16 +18,13 @@ export default function Menu({ navigation, route }) {
   let userStorage = new Users();
   let usersStorage = [];
 
-  const [user, setUser] = useState(new Users());
-  const [users, setUsers] = useState([]);
-
   const getUsersStorage = async () => {
     await storageData
       .getDataStorage(USERS_INFO)
       .then((response) => {
         if (response) {
           usersStorage = JSON.parse(response);
-          if (users) {
+          if (usersStorage) {
             userStorage = usersStorage[0];
           }
         } else {
@@ -42,7 +38,9 @@ export default function Menu({ navigation, route }) {
     getUsersStorage();
   }, []);
 
-  if (userStorage || userStorage._id || userStorage.name) {
+  console.log(userStorage);
+
+  if (userStorage._id !== "" || userStorage.name !== "") {
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Bienvenido</Text>
@@ -82,6 +80,6 @@ export default function Menu({ navigation, route }) {
       </View>
     );
   } else {
-    navigationService.navigateMenu({ navigation });
+    navigationService.logout({ navigation });
   }
 }
