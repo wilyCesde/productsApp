@@ -42,14 +42,30 @@ export default function ProductsList({ navigation }) {
       .then((response) => {
         if (response) {
           productsStorage = JSON.parse(response);
-          if (product) {
-            productStorage = productStorage[0];
+          if (productsStorage) {
+            productStorage = productsStorage[0];
           }
         } else {
-          navigationService.logout({ navigation });
+          navigationService.navigateProductsList({ navigation });
         }
       })
       .catch((e) => console.log(e));
+  };
+
+  const postProductStorage = async (product) => {
+    if (product) {
+      await storageData
+        .postDataStorage(PRODUCT_INFO, product)
+        .then((response) => {
+          console.log(response);
+          setErrorMess("Producto seleccionado...");
+          setTimeout(() => {
+            navigationService.navigateProductsForm({ navigation });
+            setErrorMess("");
+          }, 2000);
+        })
+        .catch((e) => console.log(e));
+    }
   };
 
   //#endregion
@@ -72,11 +88,7 @@ export default function ProductsList({ navigation }) {
     if (products && findProduct) {
       product = findProduct;
       if (product) {
-        setErrorMess("Producto seleccionado...");
-        setTimeout(() => {
-          navigationService.navigateProductsForm({ navigation }, product);
-          setErrorMess("");
-        }, 1500);
+        postProductStorage(product);
       }
     } else {
       setErrorMess("Intenta nuevamente.");
@@ -85,8 +97,10 @@ export default function ProductsList({ navigation }) {
   //#endregion
 
   //#region events
+
   useEffect(() => {
     getProductsStorage();
+    console.log(product);
   }, []);
   //#endregion
 
@@ -117,7 +131,7 @@ export default function ProductsList({ navigation }) {
         />
       </SafeAreaView>
       <TouchableOpacity
-        style={styles.button}
+        style={styles.subtitle}
         onPress={() => {
           navigationService.navigateMenu({ navigation });
         }}

@@ -43,7 +43,7 @@ export default function UsersList({ navigation }) {
       .then((response) => {
         if (response) {
           usersStorage = JSON.parse(response);
-          if (users) {
+          if (usersStorage) {
             userStorage = usersStorage[0];
           }
         } else {
@@ -75,7 +75,7 @@ export default function UsersList({ navigation }) {
       if (user) {
         setErrorMess("Usuario seleccionado...");
         setTimeout(() => {
-          navigationService.navigateSignup({ navigation }, user);
+          navigationService.navigateSignup({ navigation }, findUser);
           setErrorMess("");
         }, 1500);
       }
@@ -117,15 +117,15 @@ export default function UsersList({ navigation }) {
           keyExtractor={(item) => item._id}
         />
       </SafeAreaView>
+      <Text style={{ fontWeight: "bold", color: "black" }}>{errorMess}</Text>
       <TouchableOpacity
-        style={styles.button}
+        style={styles.subtitle}
         onPress={() => {
           navigationService.navigateMenu({ navigation });
         }}
       >
         <Text>Volver al menú</Text>
       </TouchableOpacity>
-      <Text style={{ fontWeight: "bold", color: "black" }}>{errorMess}</Text>
     </View>
   );
 }

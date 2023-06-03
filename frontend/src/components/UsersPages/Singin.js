@@ -22,7 +22,7 @@ export default function SignIn({ navigation }) {
   let usersStorage = [];
 
   let user = new Users();
-  let users = [];
+  // let users = [];
 
   const [formData, setFormData] = useState(new Users());
   const [errorMess, setErrorMess] = useState("");
@@ -41,7 +41,7 @@ export default function SignIn({ navigation }) {
         if (response) {
           console.log(response);
           usersStorage = JSON.parse(response);
-          if (users) {
+          if (usersStorage) {
             userStorage = usersStorage[0];
             console.log(userStorage);
           }
