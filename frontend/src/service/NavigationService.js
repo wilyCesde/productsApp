@@ -8,14 +8,14 @@ export class NavigationService {
   navigateMenu = ({ navigation }) => {
     navigation.navigate("Menu");
   };
-  navigateProductsForm = ({ navigation }) => {
-    navigation.navigate("ProductsForm");
+  navigateProductsForm = ({ navigation }, params) => {
+    navigation.navigate("ProductsForm", { info: params });
   };
   navigateProductsList = ({ navigation }) => {
     navigation.navigate("ProductsList");
   };
-  navigateSaleForm = ({ navigation }) => {
-    navigation.navigate("SaleForm");
+  navigateSaleForm = ({ navigation }, params) => {
+    navigation.navigate("SaleForm", { info: params });
   };
   navigateSaleList = ({ navigation }) => {
     navigation.navigate("SaleList");
@@ -23,8 +23,8 @@ export class NavigationService {
   navigateSignin = ({ navigation }) => {
     navigation.navigate("Signin");
   };
-  navigateSignup = ({ navigation }) => {
-    navigation.navigate("Signup");
+  navigateSignup = ({ navigation }, params) => {
+    navigation.navigate("Signup", { info: params });
   };
   navigateUsersList = ({ navigation }) => {
     navigation.navigate("UsersList");

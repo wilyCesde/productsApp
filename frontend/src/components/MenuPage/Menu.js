@@ -1,6 +1,6 @@
 import { Text, View, TouchableOpacity } from "react-native";
 import { styles } from "../../style/style";
-import React from "react";
+import React, { useEffect, useState } from "react";
 // service
 import { NavigationService } from "../../service/NavigationService";
 import { Users } from "../../models/users";
@@ -12,39 +12,37 @@ import { Auth } from "../../models/auth";
 const USERS_INFO = "@userInfo";
 const AUTH_INFO = "@authInfo";
 
-export default function Menu({ navigation }) {
-  let user = new Users();
-  let users = [];
-  let auth = new Auth();
+export default function Menu({ navigation, route }) {
   const navigationService = new NavigationService();
   const storageData = new StorageData();
 
-  const getUser = async () => {
-    users = await storageData.getDataStorage(USERS_INFO, users);
-    if (users) {
-      user = users[0];
-      console.log(user);
-    }
+  let userStorage = new Users();
+  let usersStorage = [];
+
+  const [user, setUser] = useState(new Users());
+  const [users, setUsers] = useState([]);
+
+  const getUsersStorage = async () => {
+    await storageData
+      .getDataStorage(USERS_INFO)
+      .then((response) => {
+        if (response) {
+          usersStorage = JSON.parse(response);
+          if (users) {
+            userStorage = usersStorage[0];
+          }
+        } else {
+          navigationService.logout({ navigation });
+        }
+      })
+      .catch((e) => console.log(e));
   };
 
-  const getAuth = async () => {
-    auth = await storageData.getDataStorage(AUTH_INFO, auth);
-    if (auth) {
-      console.log(auth);
-    }
-  };
+  useEffect(() => {
+    getUsersStorage();
+  }, []);
 
-  getUser();
-  getAuth();
-
-  if (
-    users === undefined ||
-    auth === undefined ||
-    users === null ||
-    auth === null
-  ) {
-    navigationService.logout({ navigation });
-  } else {
+  if (userStorage || userStorage._id || userStorage.name) {
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Bienvenido</Text>
@@ -52,7 +50,10 @@ export default function Menu({ navigation }) {
         <TouchableOpacity
           style={styles.button}
           onPress={() => {
-            navigationService.navigateProductsForm({ navigation });
+            navigationService.navigateProductsForm(
+              { navigation },
+              { info: "" }
+            );
           }}
         >
           <Text>Products</Text>
@@ -60,7 +61,7 @@ export default function Menu({ navigation }) {
         <TouchableOpacity
           style={styles.button}
           onPress={() => {
-            navigationService.navigateSaleForm({ navigation });
+            navigationService.navigateSaleForm({ navigation }, {info:''});
           }}
         >
           <Text>Sale</Text>
@@ -83,5 +84,7 @@ export default function Menu({ navigation }) {
         </TouchableOpacity>
       </View>
     );
+  } else {
+    navigationService.navigateMenu({ navigation });
   }
 }

@@ -20,6 +20,7 @@
     "react-dom": "18.2.0",
     "react-hook-form": "^7.44.2",
     "react-native": "0.71.8",
+    "react-native-dropdown-select-list": "^2.0.4",
     "react-native-web": "~0.18.10"
   },
   "devDependencies": {

@@ -7,16 +7,14 @@ import {
 } from "react-native";
 import { styles } from "../../style/style";
 import { Users } from "../../models/users";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import React from "react";
 import { UsersService } from "../../service/UsersService";
 import { NavigationService } from "../../service/NavigationService";
 import { StorageData } from "../../service/StorageDataService";
-import { Auth } from "../../models/auth";
 
 // localstorage
 const USERS_INFO = "@userInfo";
-const AUTH_INFO = "@authInfo";
 
 export default function UsersList({ navigation }) {
   //#region atributos
@@ -24,25 +22,38 @@ export default function UsersList({ navigation }) {
   const navigationService = new NavigationService();
   const storageData = new StorageData();
 
-  const [users, setUsers] = useState([]);
-  const [user, setUser] = useState(new Users());
-  const [auth, setAuth] = useState([]);
-  const [authValidate, setAuthValidate] = useState(new Auth());
+  let userStorage = new Users();
+  let usersStorage = [];
 
+  let user = new Users();
+  // let users = [];
+
+  const [users, setUsers] = useState([]);
   const [errorMess, setErrorMess] = useState("");
 
   //#endregion
 
   //#region functions
 
-  const getUser = async () => {
-    const dataUser = await storageData.getDataStorage(USERS_INFO, users);
-    const authUser = await storageData.getDataStorage(AUTH_INFO, auth);
-    if (dataUser && authUser) {
-      setUser(dataUser);
-      setAuthValidate(authUser);
-    }
+  //#region storage
+
+  const getUsersStorage = async () => {
+    await storageData
+      .getDataStorage(USERS_INFO)
+      .then((response) => {
+        if (response) {
+          usersStorage = JSON.parse(response);
+          if (users) {
+            userStorage = usersStorage[0];
+          }
+        } else {
+          navigationService.logout({ navigation });
+        }
+      })
+      .catch((e) => console.log(e));
   };
+
+  //#endregion
 
   //#region services
 
@@ -60,23 +71,27 @@ export default function UsersList({ navigation }) {
   async function editUser(item) {
     const findUser = users.find((x) => x._id === item._id);
     if (users && findUser) {
-      const dataStorage = storageData.postDataStorage(USERS_INFO, findUser);
-      if (dataStorage) {
+      user = findUser;
+      if (user) {
+        setErrorMess("Usuario seleccionado...");
         setTimeout(() => {
-          navigationService.navigateSignup({ navigation });
+          navigationService.navigateSignup({ navigation }, user);
+          setErrorMess("");
         }, 1500);
       }
+    } else {
+      setErrorMess("Intenta nuevamente.");
     }
   }
   //#endregion
 
   //#region events
+  useEffect(() => {
+    getUsersStorage();
+  }, []);
   //#endregion
 
   //#endregion
-
-  getUser();
-
   //#region front ("HTML")
   return (
     <View style={styles.container}>
@@ -102,9 +117,15 @@ export default function UsersList({ navigation }) {
           keyExtractor={(item) => item._id}
         />
       </SafeAreaView>
-      <Text style={{ fontWeight: "bold", marginTop: 10, color: "black" }}>
-        {errorMess}
-      </Text>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => {
+          navigationService.navigateMenu({ navigation });
+        }}
+      >
+        <Text>Volver al menú</Text>
+      </TouchableOpacity>
+      <Text style={{ fontWeight: "bold", color: "black" }}>{errorMess}</Text>
     </View>
   );
 }
