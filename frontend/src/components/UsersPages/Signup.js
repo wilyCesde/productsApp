@@ -10,12 +10,16 @@ import { Auth } from "../../models/auth";
 
 // localstorage
 const USERS_INFO = "@userInfo";
-const AUTH_INFO = "@authInfo";
 
 export default function SignUp({ navigation, route }) {
   //#region atributos
+
+  let userStorage = new Users();
+  let usersStorage = [];
+
+  let user = new Users();
+
   const [users, setUsers] = useState([]);
-  const [user, setUser] = useState(new Users());
 
   const userService = new UsersService();
   const navigationService = new NavigationService();
@@ -31,13 +35,20 @@ export default function SignUp({ navigation, route }) {
 
   //#region functions
 
-  const getUser = async () => {
-    const dataUser = await storageData.getDataStorage(USERS_INFO);
-    const authUser = await storageData.getDataStorage(AUTH_INFO);
-    if (dataUser && authUser) {
-      setUsers(dataUser);
-      setAuth(authUser);
-    }
+  const getUsersStorage = async () => {
+    await storageData
+      .getDataStorage(USERS_INFO)
+      .then((response) => {
+        if (response) {
+          usersStorage = JSON.parse(response);
+          if (usersStorage) {
+            userStorage = usersStorage[0];
+          }
+        } else {
+          navigationService.logout({ navigation });
+        }
+      })
+      .catch((e) => console.log(e));
   };
 
   //#region services
@@ -79,8 +90,7 @@ export default function SignUp({ navigation, route }) {
   };
 
   useEffect(() => {
-    setUser(route.params.info);
-    getUser();
+    getUsersStorage();
   }, []);
   //#endregion
 
@@ -161,6 +171,14 @@ export default function SignUp({ navigation, route }) {
         <Text style={{ fontWeight: "bold", marginTop: 10, color: "black" }}>
           {errorMess}
         </Text>
+        <TouchableOpacity
+          style={styles.subtitle}
+          onPress={() => {
+            navigationService.navigateMenu({ navigation });
+          }}
+        >
+          <Text>{user._id ? "Volver al menú" : ""}</Text>
+        </TouchableOpacity>
       </View>
     );
   }

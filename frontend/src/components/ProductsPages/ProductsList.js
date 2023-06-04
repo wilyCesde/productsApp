@@ -42,14 +42,33 @@ export default function ProductsList({ navigation }) {
       .then((response) => {
         if (response) {
           productsStorage = JSON.parse(response);
-          if (product) {
-            productStorage = productStorage[0];
+          if (productsStorage) {
+            productStorage = productsStorage[0];
           }
         } else {
-          navigationService.logout({ navigation });
+          navigationService.navigateProductsList({ navigation });
         }
       })
       .catch((e) => console.log(e));
+  };
+
+  const postProductStorage = async (product) => {
+    if (product) {
+      await storageData
+        .postDataStorage(PRODUCT_INFO, product)
+        .then((response) => {
+          if (response) {
+            console.log(response);
+          } else {
+            setErrorMess("Producto seleccionado...");
+            setTimeout(() => {
+              navigationService.navigateProductsForm({ navigation });
+              setErrorMess("");
+            }, 2000);
+          }
+        })
+        .catch((e) => console.log(e));
+    }
   };
 
   //#endregion
@@ -62,32 +81,31 @@ export default function ProductsList({ navigation }) {
       .then((response) => {
         if (response.data) {
           setProducts(response.data);
+        } else {
+          console.log(response);
         }
       })
       .catch((e) => console.log(e));
   };
 
-  async function updateProduct(item) {
-    const findProduct = products.find((x) => x._id === item._id);
+  async function updateProduct(id) {
+    const findProduct = products.find((x) => x._id === id);
     if (products && findProduct) {
-      product = findProduct;
-      if (product) {
-        setErrorMess("Producto seleccionado...");
-        setTimeout(() => {
-          navigationService.navigateProductsForm({ navigation }, product);
-          setErrorMess("");
-        }, 1500);
-      }
+      postProductStorage(findProduct);
     } else {
-      setErrorMess("Intenta nuevamente.");
+      setErrorMess("Intenta nuevamente...");
+      setTimeout(() => {
+        setErrorMess("");
+      }, 1000);
     }
   }
   //#endregion
 
   //#region events
+
   useEffect(() => {
     getProductsStorage();
-  }, []);
+  });
   //#endregion
 
   //#endregion
@@ -105,7 +123,7 @@ export default function ProductsList({ navigation }) {
           renderItem={({ item }) => (
             <TouchableOpacity
               onPress={() => {
-                updateProduct(item);
+                updateProduct(item._id);
               }}
             >
               <Text style={styles.item}>
@@ -113,11 +131,11 @@ export default function ProductsList({ navigation }) {
               </Text>
             </TouchableOpacity>
           )}
-          keyExtractor={(item) => item._id}
+          // keyExtractor={(item) => item._id}
         />
       </SafeAreaView>
       <TouchableOpacity
-        style={styles.button}
+        style={styles.subtitle}
         onPress={() => {
           navigationService.navigateMenu({ navigation });
         }}

@@ -9,35 +9,50 @@ import { Products } from "../../models/products";
 import { ProductsService } from "../../service/ProductsService";
 
 // localstorage
-const AUTH_INFO = "@authInfo";
 const PRODUCT_INFO = "@productInfo";
 
-export default function ProductsForm({ navigation, route }) {
+export default function ProductsForm({ navigation }) {
   //#region atributos
-  const [products, setProducts] = useState([]);
-  const [product, setProduct] = useState(new Products());
-
   const productsService = new ProductsService();
   const navigationService = new NavigationService();
   const storageData = new StorageData();
+
+  let productStorage = new Users();
+  let productsStorage = [];
+
+  let product = new Products();
+  // let products = [];
 
   const [formData, setFormData] = useState(product);
   const [errorMess, setErrorMess] = useState("");
 
   const { handleSubmit, reset } = useForm({
-    defaultValues: new Users(),
+    defaultValues: product,
   });
   //#endregion
 
   //#region functions
 
-  const getProduct = async () => {
-    const dataProduct = await storageData.getDataStorage(PRODUCT_INFO);
-    const authUser = await storageData.getDataStorage(AUTH_INFO);
-    if (dataProduct && authUser) {
-      setProducts(dataProduct);
-      setAuth(authUser);
-    }
+  const getProductsStorage = async () => {
+    await storageData
+      .getDataStorage(PRODUCT_INFO)
+      .then((response) => {
+        reset()
+        if (response) {
+          productsStorage = JSON.parse(response);
+          if (productsStorage) {
+            productStorage = productsStorage[0];
+            if (productStorage) {
+              product = productStorage;
+            }
+          }
+          console.log(product);
+        } else {
+          // navigationService.navigateProductsForm({ navigation });
+          console.log(response);
+        }
+      })
+      .catch((e) => console.log(e));
   };
 
   //#region services
@@ -79,9 +94,8 @@ export default function ProductsForm({ navigation, route }) {
   };
 
   useEffect(() => {
-    setProduct(route.params.info);
-    getProduct();
-  }, []);
+    getProductsStorage();
+  },[]);
   //#endregion
 
   //#endregion
@@ -95,13 +109,13 @@ export default function ProductsForm({ navigation, route }) {
         style={styles.textInput}
         placeholder="Name"
         onChangeText={(e) => onChange(e, "name")}
-        defaultValue={product.name ? product.name : formData.name}
+        defaultValue={product.name}
       />
       <TextInput
         style={styles.textInput}
         placeholder="Price"
         onChangeText={(e) => onChange(e, "price")}
-        defaultValue={product.price ? product.price : formData.price}
+        defaultValue={product.price}
       />
       <TouchableOpacity
         style={styles.button}
@@ -120,19 +134,23 @@ export default function ProductsForm({ navigation, route }) {
       </TouchableOpacity>
       <TouchableOpacity
         onPress={() => {
-          product._id
-            ? navigationService.navigateMenu({ navigation })
-            : navigationService.navigateProductsList({ navigation });
+          navigationService.navigateProductsList({ navigation });
         }}
       >
-        <Text style={styles.text}>
-          {product._id ? "Volver al menú" : `Seleccionar productos`}
-        </Text>
+        <Text style={styles.text}>Seleccionar productos</Text>
       </TouchableOpacity>
 
       <Text style={{ fontWeight: "bold", marginTop: 10, color: "black" }}>
         {errorMess}
       </Text>
+      <TouchableOpacity
+        style={styles.subtitle}
+        onPress={() => {
+          navigationService.navigateMenu({ navigation });
+        }}
+      >
+        <Text>Volver al menú</Text>
+      </TouchableOpacity>
     </View>
   );
 }

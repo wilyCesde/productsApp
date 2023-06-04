@@ -5,85 +5,110 @@ import {
   FlatList,
   TouchableOpacity,
 } from "react-native";
-import { url } from "../../environments/env";
 import { styles } from "../../style/style";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import React from "react";
-import axios from "axios";
-import { Products } from "../../models/products";
-import { Users } from "../../models/users";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { NavigationService } from "../../service/NavigationService";
+import { StorageData } from "../../service/StorageDataService";
+import { Sale } from "../../models/sale";
+import { SaleService } from "../../service/SaleService";
 
-const USER_INFO = "@userInfo";
+// localstorage
+const SALES_INFO = "@saleInfo";
 
-export default function SaleList({ navigation }) {
+export default function ProductsList({ navigation }) {
   //#region atributos
-  let products = [];
-  let product = new Products();
-  let user = new Users();
+  const saleService = new SaleService();
+  const navigationService = new NavigationService();
 
-  const [data, setData] = useState([]);
+  let sale = new Sale();
+  // let products = []
+
+  const [sales, setSales] = useState([]);
+  const [errorMess, setErrorMess] = useState("");
   //#endregion
 
   //#region functions
 
+  //#region storage
+
+  //#endregion
+
   //#region services
 
-  const getProducts = async () => {
-    await axios
-      .get(`${url}/products/getAll`)
+  const getSales = async () => {
+    await saleService
+      .getAllSale()
       .then((response) => {
         if (response.data) {
-          setData(response.data);
+          console.log(response.data);
+          setSales(response.data);
         }
       })
-      .catch((e) => {
-        console.log(e);
-      });
+      .catch((e) => console.log(e));
   };
 
-  async function editProduct(item) {
-    const findProduct = data.find((x) => x._id === item._id);
-    if (data && findProduct) {
-      await AsyncStorage.getItem(USER_INFO);
-      navigation.navigate("Products", {
-        product: findProduct,
-        user: user,
-      });
-    }
+  async function deleteSale(sale) {
+    await saleService
+      .deleteSale(sale._id)
+      .then((response) => {
+        if (response) {
+          setErrorMess("Venta eliminada...");
+          setTimeout(() => {
+            navigationService.navigateSaleList({ navigation });
+            setErrorMess("");
+          }, 2000);
+        } else {
+          setErrorMess("No se pudo eliminar...");
+          setTimeout(() => {
+            navigationService.navigateSaleList({ navigation });
+            setErrorMess("");
+          }, 2000);
+        }
+      })
+      .catch((e) => console.log(e));
   }
   //#endregion
 
   //#region events
-  //#endregion
 
   //#endregion
 
+  //#endregion
   //#region front ("HTML")
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Products List</Text>
-      <TouchableOpacity onPress={getProducts}>
-        <Text style={styles.subtitle}>Vender los productos - Click aquí</Text>
+      <Text style={styles.title}>Sale List</Text>
+      <TouchableOpacity onPress={getSales}>
+        <Text style={styles.subtitle}>Gestiona las ventas - Click aquí</Text>
       </TouchableOpacity>
 
       <SafeAreaView style={styles.container}>
         <FlatList
-          data={data}
+          data={sales}
           renderItem={({ item }) => (
             <TouchableOpacity
               onPress={() => {
-                editProduct(item);
+                deleteSale(item);
               }}
             >
               <Text style={styles.item}>
-                {item.name} - {item.price} | Click to Sale
+                {item.username} - {item.product} - {item.price} | Click to Delete
               </Text>
             </TouchableOpacity>
           )}
           keyExtractor={(item) => item._id}
         />
       </SafeAreaView>
+      <TouchableOpacity
+        style={styles.subtitle}
+        onPress={() => {
+          navigationService.navigateMenu({ navigation });
+        }}
+      >
+        <Text>Volver al menú</Text>
+      </TouchableOpacity>
+      <Text style={{ fontWeight: "bold", color: "black" }}>{errorMess}</Text>
     </View>
   );
 }

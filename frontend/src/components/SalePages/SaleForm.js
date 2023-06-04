@@ -162,19 +162,25 @@ export default function SaleFrom({ navigation, route }) {
       </TouchableOpacity>
       <TouchableOpacity
         onPress={() => {
-          sale._id
-            ? navigationService.navigateMenu({ navigation })
-            : navigationService.navigateSaleList({ navigation });
+          navigationService.navigateSaleList({ navigation });
         }}
       >
         <Text style={styles.text}>
-          {sale._id ? "Volver al menú" : `Seleccionar productos`}
+          {sale._id ? "" : `Seleccionar productos`}
         </Text>
       </TouchableOpacity>
 
       <Text style={{ fontWeight: "bold", marginTop: 10, color: "black" }}>
         {errorMess}
       </Text>
+      <TouchableOpacity
+        style={styles.subtitle}
+        onPress={() => {
+          navigationService.navigateMenu({ navigation });
+        }}
+      >
+        <Text>Volver al menú</Text>
+      </TouchableOpacity>
     </View>
   );
 }

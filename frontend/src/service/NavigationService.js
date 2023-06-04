@@ -2,14 +2,15 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // localstorage
 const USERS_INFO = "@userInfo";
-const AUTH_INFO = "@authInfo";
+const PRODUCTS_INFO = "@productInfo";
+const SALES_INFO = "@saleInfo";
 
 export class NavigationService {
   navigateMenu = ({ navigation }) => {
     navigation.navigate("Menu");
   };
-  navigateProductsForm = ({ navigation }, params) => {
-    navigation.navigate("ProductsForm", { info: params });
+  navigateProductsForm = ({ navigation }) => {
+    navigation.navigate("ProductsForm");
   };
   navigateProductsList = ({ navigation }) => {
     navigation.navigate("ProductsList");
@@ -31,7 +32,8 @@ export class NavigationService {
   };
   logout = async ({ navigation }) => {
     await AsyncStorage.removeItem(USERS_INFO);
-    await AsyncStorage.removeItem(AUTH_INFO);
+    await AsyncStorage.removeItem(PRODUCTS_INFO);
+    await AsyncStorage.removeItem(SALES_INFO);
     navigation.navigate("Signin");
   };
 }

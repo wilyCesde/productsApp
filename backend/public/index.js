@@ -6,8 +6,8 @@ require("dotenv").config(); // Manejo de variables de entorno en el archivo .env
 const routes = require("./src/app/controllers/routes");
 
 const app = express();
-const hostname =
-  process.env.hostname ||
+const url =
+  process.env.URL ||
   `mongodb+srv://punxio06:1414@cluster0.gfhiy0e.mongodb.net?retryWrites=true&w=majority`;
 const port = process.env.PORT || 3200;
 
@@ -23,7 +23,7 @@ app.get("/", (req, res) => {
 });
 
 mongoose
-  .connect(hostname)
+  .connect(url)
   .then(() => console.log("Conectado a la base de datos de MongoDB Atlas"))
   .catch(() => console.error("Error de conexión a la base de datos"));
 
