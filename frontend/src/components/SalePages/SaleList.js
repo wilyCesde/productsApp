@@ -6,15 +6,10 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { styles } from "../../style/style";
-import { useEffect, useState } from "react";
-import React from "react";
+import React, { useState } from "react";
 import { NavigationService } from "../../service/NavigationService";
-import { StorageData } from "../../service/StorageDataService";
 import { Sale } from "../../models/sale";
 import { SaleService } from "../../service/SaleService";
-
-// localstorage
-const SALES_INFO = "@saleInfo";
 
 export default function ProductsList({ navigation }) {
   //#region atributos
@@ -22,7 +17,6 @@ export default function ProductsList({ navigation }) {
   const navigationService = new NavigationService();
 
   let sale = new Sale();
-  // let products = []
 
   const [sales, setSales] = useState([]);
   const [errorMess, setErrorMess] = useState("");
@@ -41,7 +35,6 @@ export default function ProductsList({ navigation }) {
       .getAllSale()
       .then((response) => {
         if (response.data) {
-          console.log(response.data);
           setSales(response.data);
         }
       })
@@ -93,7 +86,8 @@ export default function ProductsList({ navigation }) {
               }}
             >
               <Text style={styles.item}>
-                {item.username} - {item.product} - {item.price} | Click to Delete
+                {item.username} - {item.product} - {item.price} | Click to
+                Delete
               </Text>
             </TouchableOpacity>
           )}

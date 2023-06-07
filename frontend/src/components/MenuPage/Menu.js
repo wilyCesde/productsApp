@@ -18,29 +18,39 @@ export default function Menu({ navigation, route }) {
   let userStorage = new Users();
   let usersStorage = [];
 
+  async function getStorageData() {
+    return await storageData.getDataStorage(USERS_INFO);
+  }
+
   const getUsersStorage = async () => {
-    await storageData
-      .getDataStorage(USERS_INFO)
+    getStorageData()
       .then((response) => {
         if (response) {
           usersStorage = JSON.parse(response);
-          if (usersStorage) {
-            userStorage = usersStorage[0];
-          }
+          if (usersStorage) userStorage = usersStorage[0];
         } else {
-          navigationService.logout({ navigation });
+          getStorageData().then((response) => {
+            if (response) {
+              usersStorage = JSON.parse(response);
+              if (usersStorage) userStorage = usersStorage[0];
+            }
+          });
         }
       })
       .catch((e) => console.log(e));
   };
 
   useEffect(() => {
-    getUsersStorage();
-  }, []);
+    if (userStorage) {
+      navigationService.logout({ navigation });
+    } else {
+      getUsersStorage();
+    }
+  });
 
-  console.log(userStorage);
-
-  if (userStorage._id !== "" || userStorage.name !== "") {
+  if (!userStorage) {
+    navigationService.navigateSignin({ navigation });
+  } else {
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Bienvenido</Text>
@@ -48,7 +58,7 @@ export default function Menu({ navigation, route }) {
         <TouchableOpacity
           style={styles.button}
           onPress={() => {
-            navigationService.navigateProductsForm({ navigation });
+            navigationService.navigateProductsForm({ navigation }, "");
           }}
         >
           <Text>Products</Text>
@@ -79,7 +89,5 @@ export default function Menu({ navigation, route }) {
         </TouchableOpacity>
       </View>
     );
-  } else {
-    navigationService.logout({ navigation });
   }
 }

@@ -1,59 +1,25 @@
 import { Text, View, TextInput, TouchableOpacity } from "react-native";
-import { useForm } from "react-hook-form";
 import { styles } from "../../style/style";
-import { Users } from "../../models/users";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { NavigationService } from "../../service/NavigationService";
-import { StorageData } from "../../service/StorageDataService";
 import { Products } from "../../models/products";
 import { ProductsService } from "../../service/ProductsService";
 
-// localstorage
-const PRODUCT_INFO = "@productInfo";
-
-export default function ProductsForm({ navigation }) {
+export default function ProductsForm({ navigation, route }) {
   //#region atributos
   const productsService = new ProductsService();
   const navigationService = new NavigationService();
-  const storageData = new StorageData();
-
-  let productStorage = new Users();
-  let productsStorage = [];
 
   let product = new Products();
+  if (route.params.product) product = route.params.product;
   // let products = [];
 
   const [formData, setFormData] = useState(product);
   const [errorMess, setErrorMess] = useState("");
 
-  const { handleSubmit, reset } = useForm({
-    defaultValues: product,
-  });
   //#endregion
 
   //#region functions
-
-  const getProductsStorage = async () => {
-    await storageData
-      .getDataStorage(PRODUCT_INFO)
-      .then((response) => {
-        reset()
-        if (response) {
-          productsStorage = JSON.parse(response);
-          if (productsStorage) {
-            productStorage = productsStorage[0];
-            if (productStorage) {
-              product = productStorage;
-            }
-          }
-          console.log(product);
-        } else {
-          // navigationService.navigateProductsForm({ navigation });
-          console.log(response);
-        }
-      })
-      .catch((e) => console.log(e));
-  };
 
   //#region services
   //create user
@@ -80,7 +46,7 @@ export default function ProductsForm({ navigation }) {
           setErrorMess("Producto actualizado con exito.");
           setTimeout(() => {
             setErrorMess("");
-            navigationService.navigateUsersList({ navigation });
+            navigationService.navigateProductsList({ navigation });
           }, 2000);
         }
       })
@@ -93,9 +59,6 @@ export default function ProductsForm({ navigation }) {
     setFormData({ ...formData, [type]: e });
   };
 
-  useEffect(() => {
-    getProductsStorage();
-  },[]);
   //#endregion
 
   //#endregion
@@ -109,13 +72,13 @@ export default function ProductsForm({ navigation }) {
         style={styles.textInput}
         placeholder="Name"
         onChangeText={(e) => onChange(e, "name")}
-        defaultValue={product.name}
+        defaultValue={product.name ? product.name : formData.name}
       />
       <TextInput
         style={styles.textInput}
         placeholder="Price"
         onChangeText={(e) => onChange(e, "price")}
-        defaultValue={product.price}
+        defaultValue={product.price ? product.price : formData.price}
       />
       <TouchableOpacity
         style={styles.button}

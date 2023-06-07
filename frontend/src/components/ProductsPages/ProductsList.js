@@ -6,24 +6,15 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { styles } from "../../style/style";
-import { useEffect, useState } from "react";
-import React from "react";
+import React, { useState } from "react";
 import { NavigationService } from "../../service/NavigationService";
-import { StorageData } from "../../service/StorageDataService";
 import { Products } from "../../models/products";
 import { ProductsService } from "../../service/ProductsService";
-
-// localstorage
-const PRODUCT_INFO = "@productInfo";
 
 export default function ProductsList({ navigation }) {
   //#region atributos
   const productsService = new ProductsService();
   const navigationService = new NavigationService();
-  const storageData = new StorageData();
-
-  let productStorage = new Products();
-  let productsStorage = [];
 
   let product = new Products();
   // let products = []
@@ -36,41 +27,6 @@ export default function ProductsList({ navigation }) {
 
   //#region storage
 
-  const getProductsStorage = async () => {
-    await storageData
-      .getDataStorage(PRODUCT_INFO)
-      .then((response) => {
-        if (response) {
-          productsStorage = JSON.parse(response);
-          if (productsStorage) {
-            productStorage = productsStorage[0];
-          }
-        } else {
-          navigationService.navigateProductsList({ navigation });
-        }
-      })
-      .catch((e) => console.log(e));
-  };
-
-  const postProductStorage = async (product) => {
-    if (product) {
-      await storageData
-        .postDataStorage(PRODUCT_INFO, product)
-        .then((response) => {
-          if (response) {
-            console.log(response);
-          } else {
-            setErrorMess("Producto seleccionado...");
-            setTimeout(() => {
-              navigationService.navigateProductsForm({ navigation });
-              setErrorMess("");
-            }, 2000);
-          }
-        })
-        .catch((e) => console.log(e));
-    }
-  };
-
   //#endregion
 
   //#region services
@@ -81,8 +37,6 @@ export default function ProductsList({ navigation }) {
       .then((response) => {
         if (response.data) {
           setProducts(response.data);
-        } else {
-          console.log(response);
         }
       })
       .catch((e) => console.log(e));
@@ -91,7 +45,11 @@ export default function ProductsList({ navigation }) {
   async function updateProduct(id) {
     const findProduct = products.find((x) => x._id === id);
     if (products && findProduct) {
-      postProductStorage(findProduct);
+      setErrorMess("Producto seleccionado...");
+      setTimeout(() => {
+        navigationService.navigateProductsForm({ navigation }, findProduct);
+        setErrorMess("");
+      }, 2000);
     } else {
       setErrorMess("Intenta nuevamente...");
       setTimeout(() => {
@@ -103,9 +61,6 @@ export default function ProductsList({ navigation }) {
 
   //#region events
 
-  useEffect(() => {
-    getProductsStorage();
-  });
   //#endregion
 
   //#endregion
