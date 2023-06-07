@@ -129,7 +129,6 @@ export default function SaleFrom({ navigation, route }) {
             .then((response) => {
               if (response) {
                 sale.price = response.data.price;
-                console.log(sale);
               }
             })
             .catch((e) => console.log(e));
@@ -140,7 +139,6 @@ export default function SaleFrom({ navigation, route }) {
       <SelectList
         setSelected={(value) => {
           if (value) sale.username = value;
-          console.log(sale);
         }}
         data={users}
         save="value"

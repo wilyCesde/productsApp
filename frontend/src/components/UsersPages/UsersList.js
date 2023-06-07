@@ -7,23 +7,14 @@ import {
 } from "react-native";
 import { styles } from "../../style/style";
 import { Users } from "../../models/users";
-import { useEffect, useState } from "react";
-import React from "react";
+import React, { useState } from "react";
 import { UsersService } from "../../service/UsersService";
 import { NavigationService } from "../../service/NavigationService";
-import { StorageData } from "../../service/StorageDataService";
-
-// localstorage
-const USERS_INFO = "@userInfo";
 
 export default function UsersList({ navigation }) {
   //#region atributos
   const userService = new UsersService();
   const navigationService = new NavigationService();
-  const storageData = new StorageData();
-
-  let userStorage = new Users();
-  let usersStorage = [];
 
   let user = new Users();
   // let users = [];
@@ -34,26 +25,6 @@ export default function UsersList({ navigation }) {
   //#endregion
 
   //#region functions
-
-  //#region storage
-
-  const getUsersStorage = async () => {
-    await storageData
-      .getDataStorage(USERS_INFO)
-      .then((response) => {
-        if (response) {
-          usersStorage = JSON.parse(response);
-          if (usersStorage) {
-            userStorage = usersStorage[0];
-          }
-        } else {
-          navigationService.logout({ navigation });
-        }
-      })
-      .catch((e) => console.log(e));
-  };
-
-  //#endregion
 
   //#region services
 
@@ -83,12 +54,6 @@ export default function UsersList({ navigation }) {
       setErrorMess("Intenta nuevamente.");
     }
   }
-  //#endregion
-
-  //#region events
-  useEffect(() => {
-    getUsersStorage();
-  }, []);
   //#endregion
 
   //#endregion
