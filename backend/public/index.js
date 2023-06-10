@@ -8,7 +8,7 @@ const routes = require("./src/app/controllers/routes");
 const app = express();
 const url =
   process.env.URL ||
-  `mongodb+srv://punxio06:1414@cluster0.gfhiy0e.mongodb.net?retryWrites=true&w=majority`;
+  ` mongodb+srv://camaleon901:8orE7ucpOH5nW7Sq@renta-vehiculos.smsbder.mongodb.net?retryWrites=true&w=majority`;
 const port = process.env.PORT || 3200;
 
 // Middleware para json
